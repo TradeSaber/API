@@ -23,7 +23,7 @@ namespace TradeSaber
     public class Startup
     {
         public IConfiguration Configuration { get; }
-
+        readonly string allowSpecificOrigins = "_allowSpecificOrigins";
         public Startup(IConfiguration config)
             => Configuration = config;
 
@@ -47,6 +47,18 @@ namespace TradeSaber
             services.AddSingleton<UserService>();
             services.AddSingleton<DiscordService>();
             services.AddSingleton<CardDispatcher>();
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: allowSpecificOrigins, opt =>
+                {
+                    opt.WithOrigins("http://localhost:8080",
+                        "https://localhost:44307",
+                        "https://tradesaber.com")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -81,6 +93,7 @@ namespace TradeSaber
 
             app.UseHttpsRedirection();
             app.UseRouting();
+            app.UseCors(allowSpecificOrigins);
             app.UseAuthentication();
             app.UseAuthorization();
 

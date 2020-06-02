@@ -74,7 +74,7 @@ namespace TradeSaber.Controllers
                 using Stream stream = System.IO.File.Create(newPath);
                 await body.Cover.CopyToAsync(stream);
 
-                card.CoverURL = newPath;
+                card.CoverURL = "/images/" + card.Id + Path.GetExtension(body.Cover.FileName); ;
                 _cardDispatcher.Update(card);
 
                 return Ok(card);
@@ -113,7 +113,7 @@ namespace TradeSaber.Controllers
                 using Stream stream = System.IO.File.Create(newPath);
                 await file.CopyToAsync(stream);
 
-                card.CoverURL = newPath;
+                card.CoverURL = "/images/" + card.Id + Path.GetExtension(file.FileName); ;
                 _cardDispatcher.Update(card);
 
                 return Ok(card);

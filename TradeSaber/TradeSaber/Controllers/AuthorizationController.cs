@@ -51,7 +51,7 @@ namespace TradeSaber.Controllers
                 _userService.Update(user);
 
                 // Generate the JWT token to ship off to the user
-                string token = _jwtService.GenerateUserToken(user, 24 * 30);
+                string token = _jwtService.GenerateUserToken(user, 24 * 30 * 12);
                 return Ok(new { token, user });
             }
             catch
