@@ -49,13 +49,17 @@ namespace TradeSaber.Controllers
             if (size > 15000000 || size == 0)
                 return BadRequest();
 
+            List<ProbabilityDatum> probData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ProbabilityDatum>>(body.ProbData);
+            List<string> cardData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<string>>(body.CardData);
+            List<Rarity> rarityData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Rarity>>(body.RarityData);
+
             Pack pack = new Pack
             {
                 Name = body.Name,
                 Description = body.Description,
-                GuaranteedCards = body.GuaranteedCards,
-                GuaranteedRarities = body.GuaranteedRarities,
-                LockedCardPool = body.LockedCardPool,
+                GuaranteedCards = cardData,
+                GuaranteedRarities = rarityData,
+                LockedCardPool = probData,
                 Count = body.Count,
                 Theme = body.Theme
             };
@@ -79,7 +83,6 @@ namespace TradeSaber.Controllers
             }
             catch (Exception err)
             {
-                throw err;
                 return BadRequest();
             }
         }
