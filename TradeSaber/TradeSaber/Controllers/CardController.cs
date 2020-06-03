@@ -49,7 +49,7 @@ namespace TradeSaber.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreateCard([FromBody] CardUpload body)
+        public async Task<IActionResult> CreateCard([FromForm] UploadCard body)
         {
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
@@ -60,7 +60,17 @@ namespace TradeSaber.Controllers
             if (size > 15000000 || size == 0)
                 return BadRequest();
 
-            Card card = body.Card;
+            Card card = new Card
+            {
+                Series = body.Series,
+                Name = body.Name,
+                Description = body.Description,
+                Master = body.Master,
+                MaxPrints = body.MaxPrints,
+                Rarity = body.Rarity,
+                Locked = body.Locked,
+                BaseProbability = body.BaseProbability
+            };
             _cardDispatcher.Create(card);
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "Images");

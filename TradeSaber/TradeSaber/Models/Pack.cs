@@ -1,10 +1,11 @@
 ﻿using MongoDB.Bson;
+using TradeSaber.Models.Settings;
 using System.Collections.Generic;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace TradeSaber.Models
 {
-    public class Pack
+    public class Pack : IPack
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]

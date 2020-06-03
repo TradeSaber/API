@@ -38,7 +38,7 @@ namespace TradeSaber.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> UploadPack([FromBody] PackUpload body)
+        public async Task<IActionResult> UploadPack([FromForm] UploadPack body)
         {
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
@@ -49,7 +49,16 @@ namespace TradeSaber.Controllers
             if (size > 15000000 || size == 0)
                 return BadRequest();
 
-            Pack pack = body.Pack;
+            Pack pack = new Pack
+            {
+                Name = body.Name,
+                Description = body.Description,
+                GuaranteedCards = body.GuaranteedCards,
+                GuaranteedRarities = body.GuaranteedRarities,
+                LockedCardPool = body.LockedCardPool,
+                Count = body.Count,
+                Theme = body.Theme
+            };
             _cardDispatcher.Create(pack);
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "Images");
@@ -68,8 +77,9 @@ namespace TradeSaber.Controllers
 
                 return Ok(pack);
             }
-            catch
+            catch (Exception err)
             {
+                throw err;
                 return BadRequest();
             }
         }

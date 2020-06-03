@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace TradeSaber.Models
 {
-    public class Card
+    public class Card : ICard
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
