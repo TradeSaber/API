@@ -36,6 +36,12 @@ namespace TradeSaber.Controllers
             return Ok(pack);
         }
 
+        [HttpGet("all")]
+        public IActionResult GetAllPacks()
+        {
+            return Ok(_cardDispatcher.GetAllPacks());
+        }
+
         [Authorize]
         [HttpPost]
         public async Task<IActionResult> UploadPack([FromForm] UploadPack body)
@@ -81,7 +87,7 @@ namespace TradeSaber.Controllers
 
                 return Ok(pack);
             }
-            catch (Exception err)
+            catch (Exception)
             {
                 return BadRequest();
             }

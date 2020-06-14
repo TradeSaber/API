@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using TradeSaber.Controllers;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using System.IO;
+using Microsoft.Extensions.FileProviders;
 
 namespace TradeSaber
 {
@@ -100,6 +101,12 @@ namespace TradeSaber
             string path = Path.Combine(Directory.GetCurrentDirectory(), "Images");
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
+
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                FileProvider = new PhysicalFileProvider(path),
+                RequestPath = "/images"
+            });
 
             app.UseEndpoints(endpoints =>
             {

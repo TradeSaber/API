@@ -57,6 +57,9 @@ namespace TradeSaber.Services
         public Pack[] PacksContainingLockedCard(string cardId)
             => _packs.Find(p => p.LockedCardPool.Any(pd => pd.Id == cardId)).ToEnumerable().ToArray();
 
+        public Pack[] GetAllPacks()
+            => _packs.Find(p => true).ToEnumerable().ToArray();
+
         public void Create(Pack pack)
             => _packs.InsertOne(pack);
 
