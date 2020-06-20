@@ -1,14 +1,14 @@
-﻿using TradeSaber.Models;
-using TradeSaber.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Http;
+﻿using System;
 using System.IO;
+using MongoDB.Bson;
+using TradeSaber.Models;
+using TradeSaber.Services;
 using System.Threading.Tasks;
-using System;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.JsonPatch;
-using System.Collections.Specialized;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TradeSaber.Controllers
 {
@@ -28,6 +28,9 @@ namespace TradeSaber.Controllers
         [HttpGet("{id}")]
         public IActionResult GetPack(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             Pack pack = _cardDispatcher.GetPack(id);
             if (pack == null)
             {
@@ -97,6 +100,9 @@ namespace TradeSaber.Controllers
         [HttpPatch("image/{id}")]
         public async Task<IActionResult> UpdateImage(string id, [FromForm] IFormFile file)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
@@ -136,6 +142,9 @@ namespace TradeSaber.Controllers
         [HttpPatch("{id}")]
         public IActionResult UpdatePack(string id, [FromBody] JsonPatchDocument<Pack> pack)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
@@ -153,6 +162,9 @@ namespace TradeSaber.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeletePack(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();

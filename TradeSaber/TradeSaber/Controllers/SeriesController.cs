@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using TradeSaber.Models;
 using TradeSaber.Services;
 
@@ -27,6 +28,9 @@ namespace TradeSaber.Controllers
         [HttpGet("{id}")]
         public IActionResult GetSeries(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             Series series = _cardDispatcher.GetSeries(id);
             if (series == null)
             {
@@ -56,6 +60,9 @@ namespace TradeSaber.Controllers
         [HttpPatch("{id}")]
         public IActionResult UpdateSeries(string id, [FromBody] JsonPatchDocument<Series> series)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
@@ -73,6 +80,9 @@ namespace TradeSaber.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteSeries(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();

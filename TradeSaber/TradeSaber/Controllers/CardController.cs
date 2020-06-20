@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.JsonPatch;
-using Microsoft.AspNetCore.Mvc;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.IO;
+using MongoDB.Bson;
 using TradeSaber.Models;
 using TradeSaber.Services;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.Authorization;
 
 namespace TradeSaber.Controllers
 {
@@ -26,13 +26,15 @@ namespace TradeSaber.Controllers
         [HttpGet("test/rolltest")]
         public IActionResult RollTest()
         {
-            
             return Ok(_cardDispatcher.RollDeckRandom(5));
         }
 
         [HttpGet("{id}")]
         public IActionResult GetCard(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             Card card = _cardDispatcher.GetCard(id);
             if (card == null)
             {
@@ -44,6 +46,9 @@ namespace TradeSaber.Controllers
         [HttpGet("series/{id}")]
         public IActionResult GetCardsFromSeries(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             return Ok(_cardDispatcher.GetCardsFromSeries(id));
         }
 
@@ -99,6 +104,9 @@ namespace TradeSaber.Controllers
         [HttpPatch("image/{id}")]
         public async Task<IActionResult> UpdateImage(string id, [FromForm] IFormFile file)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
@@ -138,6 +146,9 @@ namespace TradeSaber.Controllers
         [HttpPatch("{id}")]
         public IActionResult UpdateCard(string id, [FromBody] JsonPatchDocument<Card> card)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
@@ -155,6 +166,9 @@ namespace TradeSaber.Controllers
         [HttpDelete("{id}")]
         public IActionResult DeleteCard(string id)
         {
+            if (!ObjectId.TryParse(id, out _))
+                return NotFound();
+
             User user = _userService.UserFromContext(HttpContext);
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
