@@ -1,3 +1,4 @@
+using System.IO;
 using System.Linq;
 using System.Text;
 using TradeSaber.Services;
@@ -11,25 +12,29 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using TradeSaber.Controllers;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using System.IO;
-using Microsoft.Extensions.FileProviders;
+using System.Net.Http;
 
 namespace TradeSaber
 {
     public class Startup
     {
+        public static string APPPATH;
         public IConfiguration Configuration { get; }
         readonly string allowSpecificOrigins = "_allowSpecificOrigins";
         public Startup(IConfiguration config)
-            => Configuration = config;
+        {
+            Configuration = config;
+        }
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<APISettings>(
+                Configuration.GetSection(nameof(APISettings)));
             services.Configure<JWTSettings>(
                 Configuration.GetSection(nameof(JWTSettings)));
             services.Configure<DiscordSettings>(
@@ -37,6 +42,8 @@ namespace TradeSaber
             services.Configure<DatabaseSettings>(
                 Configuration.GetSection(nameof(DatabaseSettings)));
 
+            services.AddSingleton<IAPISettings>(sp =>
+                sp.GetRequiredService<IOptions<APISettings>>().Value);
             services.AddSingleton<IJWTSettings>(sp =>
                 sp.GetRequiredService<IOptions<JWTSettings>>().Value);
             services.AddSingleton<IDiscordSettings>(sp =>
@@ -44,8 +51,10 @@ namespace TradeSaber
             services.AddSingleton<IDatabaseSettings>(sp =>
                 sp.GetRequiredService<IOptions<DatabaseSettings>>().Value);
 
+            services.AddSingleton<HttpClient>();
             services.AddSingleton<JWTService>();
             services.AddSingleton<UserService>();
+            services.AddSingleton<CardGenerator>();
             services.AddSingleton<DiscordService>();
             services.AddSingleton<CardDispatcher>();
 
@@ -91,6 +100,7 @@ namespace TradeSaber
             {
                 app.UseDeveloperExceptionPage();
             }
+            APPPATH = env.ContentRootPath;
 
             app.UseHttpsRedirection();
             app.UseRouting();

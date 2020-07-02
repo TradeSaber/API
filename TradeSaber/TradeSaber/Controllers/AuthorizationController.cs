@@ -59,5 +59,43 @@ namespace TradeSaber.Controllers
                 return Problem();
             }
         }
+
+        [HttpPost("game")]
+        public async Task<IActionResult> GameLogin([FromBody] GameLoginBody body)
+        {
+            try
+            {
+                DiscordUser discord = await _discordService.GetDiscordUserProfile(body.AccessToken);
+                User user = _userService.Get(discord.ID);
+                if (user == null)
+                {
+                    // If the user doesn't exist, create it and add it to the database.
+                    user = new User
+                    {
+                        Banned = false,
+                        DiscordID = discord.ID,
+                        Role = TradeSaberRole.None,
+                        Inventory = new List<string>(),
+                        UnopenedPacks = new List<string>()
+                    };
+                    _userService.Create(user);
+                }
+                user.Profile = discord;
+                _userService.Update(user);
+
+                // Generate the JWT token to ship off to the user
+                string token = _jwtService.GenerateUserToken(user, 6);
+                return Ok(new { token, user });
+            }
+            catch
+            {
+                return Problem();
+            }
+        }
+
+        public class GameLoginBody
+        {
+            public string AccessToken { get; set; }
+        }
     }
 }

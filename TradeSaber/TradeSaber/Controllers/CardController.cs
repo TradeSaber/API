@@ -1,5 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using MongoDB.Bson;
+using System.Drawing;
 using TradeSaber.Models;
 using TradeSaber.Services;
 using System.Threading.Tasks;
@@ -15,19 +17,27 @@ namespace TradeSaber.Controllers
     public class CardController : ControllerBase
     {
         private readonly UserService _userService;
+        private readonly CardGenerator _cardGenerator;
         private readonly CardDispatcher _cardDispatcher;
 
-        public CardController(UserService user, CardDispatcher dispatcher)
+        public CardController(UserService user, CardGenerator cardGenerator, CardDispatcher cardDispatcher)
         {
             _userService = user;
-            _cardDispatcher = dispatcher;
+            _cardGenerator = cardGenerator;
+            _cardDispatcher = cardDispatcher;
         }
 
-        [HttpGet("test/rolltest")]
-        public IActionResult RollTest()
+        /*[HttpGet("test/updateimages")]
+        public IActionResult UpdateImageTest()
         {
-            return Ok(_cardDispatcher.RollDeckRandom(5));
-        }
+            Progress<float> progress = new Progress<float>();
+            progress.ProgressChanged += (object sender, float pro) => 
+            {
+                Console.WriteLine("Progress: " + pro.ToString("P"));
+            };
+            _cardGenerator.UpdateAllCardHTML(progress, Startup.APPPATH);
+            return Ok(Startup.APPPATH);
+        }*/
 
         [HttpGet("{id}")]
         public IActionResult GetCard(string id)
@@ -60,6 +70,9 @@ namespace TradeSaber.Controllers
             if (!user.Role.HasFlag(TradeSaberRole.Admin))
                 return Unauthorized();
 
+            if (body.Cover == null)
+                return BadRequest();
+
             long size = body.Cover.Length;
 
             if (size > 15000000 || size == 0)
@@ -78,62 +91,41 @@ namespace TradeSaber.Controllers
             };
             _cardDispatcher.Create(card);
 
+            if (!ObjectId.TryParse(card.Series, out _))
+                return NotFound();
+
+            Series series = _cardDispatcher.GetSeries(card.Series);
+            if (series == null)
+            {
+                return NotFound();
+            }
+
             var path = Path.Combine(Directory.GetCurrentDirectory(), "Images");
             if (!Directory.Exists(path))
                 Directory.CreateDirectory(path);
 
             try
             {
-                string newPath = path + "/" + card.Id + Path.GetExtension(body.Cover.FileName);
+                var extension = Path.GetExtension(body.Cover.FileName);
+                string newPath = path + "/" + card.Id + "_base" + extension;
                 using StreamReader sr = new StreamReader(body.Cover.OpenReadStream());
                 using Stream stream = System.IO.File.Create(newPath);
                 await body.Cover.CopyToAsync(stream);
-
-                card.CoverURL = "/images/" + card.Id + Path.GetExtension(body.Cover.FileName); ;
+                card.BaseURL = "/images/" + card.Id + "_base" + extension;
+                await stream.DisposeAsync();
+                stream.Close();
+                Image image = Image.FromFile(newPath);
+                using MemoryStream ms = new MemoryStream();
+                image.Save(ms, image.RawFormat);
+                byte[] imageBytes = ms.ToArray();
+                await ms.DisposeAsync();
+                string b64 = $"data:image/{extension.ToLower().Replace(".", "")};base64," + Convert.ToBase64String(imageBytes);
+                string newCoverPath = path + "/" + card.Id + "_cover.png";
+                var bytes = await _cardGenerator.Generate(b64, card, series, newCoverPath);
+                if (bytes.Length == 0) return Problem();
+                await System.IO.File.WriteAllBytesAsync(newCoverPath, bytes);
+                card.CoverURL = "/images/" + card.Id + "_cover.png";
                 _cardDispatcher.Update(card);
-
-                return Ok(card);
-            }
-            catch
-            {
-                return BadRequest();
-            }
-        }
-
-        [Authorize]
-        [HttpPatch("image/{id}")]
-        public async Task<IActionResult> UpdateImage(string id, [FromForm] IFormFile file)
-        {
-            if (!ObjectId.TryParse(id, out _))
-                return NotFound();
-
-            User user = _userService.UserFromContext(HttpContext);
-            if (!user.Role.HasFlag(TradeSaberRole.Admin))
-                return Unauthorized();
-
-            long size = file.Length;
-
-            Card card = _cardDispatcher.GetCard(id);
-            if (card == null)
-                return NotFound();
-
-            if (size > 15000000 || size == 0)
-                return BadRequest();
-
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Images");
-            if (!Directory.Exists(path))
-                Directory.CreateDirectory(path);
-
-            try
-            {
-                string newPath = path + "/" + card.Id + Path.GetExtension(file.FileName);
-                using StreamReader sr = new StreamReader(file.OpenReadStream());
-                using Stream stream = System.IO.File.Create(newPath);
-                await file.CopyToAsync(stream);
-
-                card.CoverURL = "/images/" + card.Id + Path.GetExtension(file.FileName); ;
-                _cardDispatcher.Update(card);
-
                 return Ok(card);
             }
             catch
@@ -197,289 +189,6 @@ namespace TradeSaber.Controllers
         {
             public Card Card { get; set; }
             public IFormFile Cover { get; set; }
-        }
-
-        [HttpGet("test/create")]
-        public IActionResult CreateTest()
-        {
-            Series series = new Series
-            {
-                Name = "The BSMG Staff",
-                Description = "The people who started it all. This collection consists of the Beat Saber Modding Group staff members"
-            };
-
-            _cardDispatcher.Create(series);
-
-            Card reaxt = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Legendary,
-                BaseProbability = 0.00025,
-                Description = "The TV Head himself, Reaxt.",
-                Master = "Reaxt",
-                Name = "Reaxt",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card elliottate = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Rare,
-                BaseProbability = 0.001,
-                Description = "The man with connections everywhere, it's Elliott! Seriously... this guy knows everyone!",
-                Master = "Elliottate",
-                Name = "Elliottate",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card assistant = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Rare,
-                BaseProbability = 0.001,
-                Description = "Everyone's favorite loli, Assistant!",
-                Master = "Assistant",
-                Name = "Assistant",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card umbranox = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Uncommon,
-                BaseProbability = 0.005,
-                Description = "Panda!",
-                Master = "Umbranox",
-                Name = "Umbranox",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card williums = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Uncommon,
-                BaseProbability = 0.005,
-                Description = "Is gay",
-                Master = "williums",
-                Name = "williums",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card megalon = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Uncommon,
-                BaseProbability = 0.005,
-                Description = "His soothing ASMR voice will make anyone relax",
-                Master = "Megalon",
-                Name = "Megalon",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card bobbie = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Common,
-                BaseProbability = 0.05,
-                Description = "Stop. Him. He. Is. Too. Powerful.",
-                Master = "Bobbie",
-                Name = "Bobbie",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card steven = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Common,
-                BaseProbability = 0.05,
-                Description = "Lucina Lover",
-                Master = "Steven",
-                Name = "Steven",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card melopod = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Common,
-                BaseProbability = 0.05,
-                Description = "",
-                Master = "Melopod",
-                Name = "Melopod",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            Card orangew = new Card
-            {
-                Locked = false,
-                Rarity = Rarity.Common,
-                BaseProbability = 0.05,
-                Description = "",
-                Master = "OrangeW",
-                Name = "OrangeW",
-                MaxPrints = -1,
-                Series = series.Id
-            };
-
-            _cardDispatcher.Create(reaxt);
-            _cardDispatcher.Create(assistant);
-            _cardDispatcher.Create(elliottate);
-            _cardDispatcher.Create(umbranox);
-            _cardDispatcher.Create(williums);
-            _cardDispatcher.Create(megalon);
-            _cardDispatcher.Create(bobbie);
-            _cardDispatcher.Create(steven);
-            _cardDispatcher.Create(melopod);
-            _cardDispatcher.Create(orangew);
-
-            Series modders = new Series
-            {
-                Name = "Modders I",
-                Description = "The first modders series!"
-            };
-
-            _cardDispatcher.Create(modders);
-
-            Card danike = new Card
-            {
-                Name = "DaNike",
-                Master = "DaNike",
-                BaseProbability = .00025,
-                Description = "The creator of BSIPA. His brain is so massive",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Legendary,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(danike);
-
-            Card andru = new Card
-            {
-                Name = "Andruzzzhka",
-                Master = "Andruzzzhka",
-                BaseProbability = .001,
-                Description = "The UI Wizard",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Rare,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(andru);
-
-            Card nalulululuna = new Card
-            {
-                Name = "nalulululuna",
-                Master = "nalulululuna",
-                BaseProbability = .001,
-                Description = "nalulululululululululululululululululululululuna",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Rare,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(nalulululuna);
-
-            Card shoko = new Card
-            {
-                Name = "Skoko84",
-                Master = "Skoko84",
-                BaseProbability = .005,
-                Description = "The creator of FightSabers",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Uncommon,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(shoko);
-
-            Card brian = new Card
-            {
-                Name = "brian",
-                Master = "brian",
-                BaseProbability = .005,
-                Description = "Give him pizza",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Uncommon,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(brian);
-
-            Card chris = new Card
-            {
-                Name = "chris",
-                Master = "chris",
-                BaseProbability = .005,
-                Description = "chris",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Uncommon,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(chris);
-
-            Card aeroluna = new Card
-            {
-                Name = "Aeroluna",
-                Master = "Aeroluna",
-                BaseProbability = .05,
-                Description = "Closet Furry A",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Common,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(aeroluna);
-
-            Card rabbit = new Card
-            {
-                Name = "Rabbit",
-                Master = "Rabbit",
-                BaseProbability = .05,
-                Description = "Closet Furry B",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Common,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(rabbit);
-
-            Card opl = new Card
-            {
-                Name = "opl",
-                Master = "opl",
-                BaseProbability = .05,
-                Description = "opl",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Common,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(opl);
-
-            Card moon = new Card
-            {
-                Name = "Moon",
-                Master = "Moon",
-                BaseProbability = .05,
-                Description = "Moon",
-                Locked = false,
-                MaxPrints = -1,
-                Rarity = Rarity.Common,
-                Series = modders.Id
-            };
-            _cardDispatcher.Create(moon);
-
-            return Ok();
         }
     }
 }

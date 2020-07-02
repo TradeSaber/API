@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Authorization;
+using System.Linq;
 
 namespace TradeSaber.Controllers
 {
@@ -189,80 +190,6 @@ namespace TradeSaber.Controllers
             public IFormFile Cover { get; set; }
         }
 
-        [HttpGet("test/create")]
-        public IActionResult CreatePacks()
-        {
-            Pack generic = new Pack
-            {
-                Name = "TradeSaber",
-                Description = "A generic TradeSaber card pack",
-            };
-            _cardDispatcher.Create(generic);
-
-            Pack bsmg = new Pack
-            {
-                Name = "BSMG Staff",
-                Description = "BSMG Staff Pack! Higher chance for getting BSMG cards!",
-                LockedCardPool = new List<ProbabilityDatum>
-                {
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e2e",
-                        ProbabilityBoost = .00015
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e2f",
-                        ProbabilityBoost = .00075
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e30",
-                        ProbabilityBoost = .00075
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e31",
-                        ProbabilityBoost = .0025
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e32",
-                        ProbabilityBoost = .0025
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e33",
-                        ProbabilityBoost = .0025
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e34",
-                        ProbabilityBoost = .025
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e35",
-                        ProbabilityBoost = .025
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e36",
-                        ProbabilityBoost = .025
-                    },
-                    new ProbabilityDatum
-                    {
-                        Id = "5ed1e7beb3badf0c30049e37",
-                        ProbabilityBoost = .025
-                    }
-                },
-            };
-            _cardDispatcher.Create(bsmg);
-
-            return Ok();
-        }
-
-
         [Authorize]
         [HttpGet("request")]
         public IActionResult RequestNewPack()
@@ -275,6 +202,10 @@ namespace TradeSaber.Controllers
         public IActionResult OpenPack([FromHeader] string packId)
         {
             User user = _userService.UserFromContext(HttpContext);
+
+            if (!ObjectId.TryParse(packId, out ObjectId _))
+                return BadRequest();
+
             bool packExists = user.UnopenedPacks.Contains(packId);
 
             if (packExists)
@@ -283,10 +214,13 @@ namespace TradeSaber.Controllers
                 _userService.Update(user);
                 var pack = _cardDispatcher.GetPack(packId);
                 Card[] cards = _cardDispatcher.RollFromPack(pack);
+                var cardIds = cards.Select(c => c.Id);
+                user.Inventory.AddRange(cardIds);
+                _userService.Update(user);
 
                 return Ok(cards);
             }
-            return Ok();
+            return NotFound();
         }
     }
 }

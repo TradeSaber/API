@@ -18,5 +18,6 @@ namespace TradeSaber.Models
         public bool Locked { get; set; } = false;
         public double BaseProbability { get; set; } = .05f;
         public string CoverURL { get; set; }
+        public string BaseURL { get; set; }
     }
 }

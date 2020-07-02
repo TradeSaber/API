@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace TradeSaber.Models
+﻿namespace TradeSaber.Models
 {
     public class DiscordUser
     {
