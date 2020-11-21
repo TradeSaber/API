@@ -1,4 +1,4 @@
-﻿namespace API.Settings
+﻿namespace TradeSaber.Settings
 {
     public class DiscordSettings
     {
