@@ -1,7 +1,9 @@
+using TradeSaber.Settings;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,6 +21,14 @@ namespace TradeSaber
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<DiscordSettings>(Configuration.GetSection(nameof(DiscordSettings)));
+            services.Configure<JWTSettings>(Configuration.GetSection(nameof(JWTSettings)));
+            services.Configure<HTISettings>(Configuration.GetSection(nameof(HTISettings)));
+
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<DiscordSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
