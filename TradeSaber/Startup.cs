@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,7 +33,11 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
 
             services.AddSingleton<HttpClient>();
-
+            services.AddDbContext<TradeContext>(builder =>
+            {
+                builder.UseNpgsql(Configuration.GetConnectionString("Default"));
+                builder.UseSnakeCaseNamingConvention();
+            });
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(opt =>
@@ -51,7 +56,7 @@ namespace TradeSaber
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext)
         {
             if (env.IsDevelopment())
             {
@@ -60,6 +65,7 @@ namespace TradeSaber
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
 
+            tradeContext.Database.Migrate();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
