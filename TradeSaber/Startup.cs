@@ -1,5 +1,7 @@
+using System.Net.Http;
 using TradeSaber.Settings;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -29,6 +31,18 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
 
+            services.AddSingleton<HttpClient>();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(opt =>
+                {
+                    opt.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -45,12 +59,32 @@ namespace TradeSaber
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
             }
+
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
+
+            app.UseCors(x => x
+                .AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapGet("/", async context =>
+                {
+                    await context.Response.WriteAsync("TradeSaber OK!");
+                });
+                endpoints.MapGet("/api", async context =>
+                {
+                    await context.Response.WriteAsync("TradeSaber OK!");
+                });
                 endpoints.MapControllers();
+                endpoints.MapFallback(async context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status404NotFound;
+                    await context.Response.WriteAsync("Not Found");
+                });
             });
         }
     }
