@@ -1,6 +1,7 @@
 ﻿using System;
 using NodaTime;
 using TradeSaber.Models.Discord;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TradeSaber.Models
 {
@@ -9,6 +10,8 @@ namespace TradeSaber.Models
         #region User Info
 
         public Guid ID { get; set; }
+
+        [Column(TypeName = "jsonb")]
         public DiscordUser Profile { get; set; } = null!;
         public UserState State { get; set; }
         public Role Role { get; set; }
@@ -34,7 +37,7 @@ namespace TradeSaber.Models
 
         public bool Equals(User? other)
         {
-            return other != null && ID == other.ID;
+            return ID == other?.ID;
         }
 
         public override bool Equals(object? obj)
@@ -45,6 +48,16 @@ namespace TradeSaber.Models
         public override int GetHashCode()
         {
             return ID.GetHashCode();
+        }
+
+        public static bool operator !=(User u1, User u2)
+        {
+            return !(u1 == u2);
+        }
+
+        public static bool operator ==(User u1, User u2)
+        {
+            return u1 == u2 || u1.Equals(u2);
         }
 
         #endregion
