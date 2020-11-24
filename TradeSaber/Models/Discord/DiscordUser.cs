@@ -4,7 +4,7 @@ namespace TradeSaber.Models.Discord
 {
     public record DiscordUser(string Id, string Username, string Discriminator, string Avatar)
     {
-        private string _avatar;
+        private string _avatar = null!;
 
         [JsonPropertyName("avatar")]
         public string Avatar

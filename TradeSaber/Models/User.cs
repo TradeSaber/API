@@ -9,7 +9,7 @@ namespace TradeSaber.Models
         #region User Info
 
         public Guid ID { get; set; }
-        public DiscordUser Profile { get; set; }
+        public DiscordUser Profile { get; set; } = null!;
         public UserState State { get; set; }
         public Role Role { get; set; }
 
@@ -32,12 +32,12 @@ namespace TradeSaber.Models
 
         #region Equatables 
 
-        public bool Equals(User other)
+        public bool Equals(User? other)
         {
-            return ID == other.ID;
+            return other != null && ID == other.ID;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             return Equals(obj as User);
         }
