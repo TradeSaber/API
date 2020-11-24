@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -60,7 +61,7 @@ namespace TradeSaber
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext, ILogger<Startup> logger)
         {
             if (env.IsDevelopment())
             {
@@ -69,7 +70,8 @@ namespace TradeSaber
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TradeSaber v1"));
             }
 
-            tradeContext.Database.Migrate();
+            logger.LogInformation("Ensuring Database Connection...");
+            tradeContext.Database.EnsureCreated();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthorization();
@@ -79,6 +81,7 @@ namespace TradeSaber
                 .AllowAnyMethod()
                 .AllowAnyHeader());
 
+            logger.LogInformation("Mapping Endpoints...");
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapGet("/", async context =>

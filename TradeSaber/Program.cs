@@ -7,14 +7,20 @@ namespace TradeSaber
 {
     public class Program
     {
+        public const string LOG_OUTPUT_FORMAT = "[{Timestamp:HH:mm:ss} | {Level:u3}] {Message:lj}{NewLine}{Exception}";
+        public const string LOG_OUTPUT_FORMAT_FILE = "[{Timestamp:HH:mm:ss} | {Level:u3}] ({SourceContext}) {Message:lj}{NewLine}{Exception}";
+
         public static void Main(string[] args)
         {
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Debug()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
                 .Enrich.FromLogContext()
-                .WriteTo.Console()
-                .WriteTo.File("Logs/log.txt", rollingInterval: RollingInterval.Day)
+                .WriteTo.Console(outputTemplate: LOG_OUTPUT_FORMAT)
+                .WriteTo.File("Logs/log-.txt",
+                    rollingInterval: RollingInterval.Day,
+                    outputTemplate: LOG_OUTPUT_FORMAT_FILE,
+                    rollOnFileSizeLimit: true)
                 .CreateLogger();
             CreateHostBuilder(args).Build().Run();
         }
