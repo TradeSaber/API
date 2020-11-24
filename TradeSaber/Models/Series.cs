@@ -14,5 +14,12 @@ namespace TradeSaber.Models
         public string BannerURL { get; set; } = null!;
 
         public IList<Card> Cards { get; set; } = null!;
+
+        public class Reference
+        {
+            public Guid ID { get; set; }
+            public Series Series { get; set; } = null!;
+            public float? Boost { get; set; }
+        }
     }
 }

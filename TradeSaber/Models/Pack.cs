@@ -11,6 +11,7 @@ namespace TradeSaber.Models
         public string Description { get; set; } = null!;
         public string CoverURL { get; set; } = null!;
         public string Theme { get; set; } = null!;
+        public float? Value { get; set; }
         public int Count { get; set; }
 
         public IList<Card.Reference> CardPool { get; set; } = null!;

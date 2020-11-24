@@ -14,8 +14,8 @@ using TradeSaber.Models.Discord;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    [Migration("20201124130050_Initial")]
-    partial class Initial
+    [Migration("20201124215331_Create")]
+    partial class Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -123,20 +123,57 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("card_id");
 
+                    b.Property<Guid?>("MutationID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("mutation_id");
+
                     b.Property<Guid?>("PackID")
                         .HasColumnType("uuid")
                         .HasColumnName("pack_id");
 
                     b.HasKey("ID")
-                        .HasName("pk_reference");
+                        .HasName("pk_card_reference");
 
                     b.HasIndex("CardID")
                         .HasDatabaseName("ix_reference_card_id");
 
+                    b.HasIndex("MutationID")
+                        .HasDatabaseName("ix_reference_mutation_id");
+
                     b.HasIndex("PackID")
                         .HasDatabaseName("ix_reference_pack_id");
 
-                    b.ToTable("reference");
+                    b.ToTable("card_reference");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Mutation", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<bool>("Active")
+                        .HasColumnType("boolean")
+                        .HasColumnName("active");
+
+                    b.Property<float?>("GlobalTirBoost")
+                        .HasColumnType("real")
+                        .HasColumnName("global_tir_boost");
+
+                    b.Property<float?>("GlobalXPBoost")
+                        .HasColumnType("real")
+                        .HasColumnName("global_xp_boost");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("ID")
+                        .HasName("pk_mutations");
+
+                    b.ToTable("mutations");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Pack", b =>
@@ -174,6 +211,10 @@ namespace TradeSaber.Migrations
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("theme");
+
+                    b.Property<float?>("Value")
+                        .HasColumnType("real")
+                        .HasColumnName("value");
 
                     b.HasKey("ID")
                         .HasName("pk_packs");
@@ -222,6 +263,37 @@ namespace TradeSaber.Migrations
                         .HasName("pk_series");
 
                     b.ToTable("series");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Series+Reference", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<float?>("Boost")
+                        .HasColumnType("real")
+                        .HasColumnName("boost");
+
+                    b.Property<Guid?>("MutationID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("mutation_id");
+
+                    b.Property<Guid?>("SeriesID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("series_id");
+
+                    b.HasKey("ID")
+                        .HasName("pk_series_reference");
+
+                    b.HasIndex("MutationID")
+                        .HasDatabaseName("ix_reference_mutation_id1");
+
+                    b.HasIndex("SeriesID")
+                        .HasDatabaseName("ix_reference_series_id");
+
+                    b.ToTable("series_reference");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.User", b =>
@@ -306,12 +378,39 @@ namespace TradeSaber.Migrations
                         .HasForeignKey("CardID")
                         .HasConstraintName("fk_reference_cards_card_id");
 
+                    b.HasOne("TradeSaber.Models.Mutation", null)
+                        .WithMany("Cards")
+                        .HasForeignKey("MutationID")
+                        .HasConstraintName("fk_reference_mutations_mutation_id");
+
                     b.HasOne("TradeSaber.Models.Pack", null)
                         .WithMany("CardPool")
                         .HasForeignKey("PackID")
                         .HasConstraintName("fk_reference_packs_pack_id");
 
                     b.Navigation("Card");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Series+Reference", b =>
+                {
+                    b.HasOne("TradeSaber.Models.Mutation", null)
+                        .WithMany("Series")
+                        .HasForeignKey("MutationID")
+                        .HasConstraintName("fk_reference_mutations_mutation_id");
+
+                    b.HasOne("TradeSaber.Models.Series", "Series")
+                        .WithMany()
+                        .HasForeignKey("SeriesID")
+                        .HasConstraintName("fk_reference_series_series_id");
+
+                    b.Navigation("Series");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Mutation", b =>
+                {
+                    b.Navigation("Cards");
+
+                    b.Navigation("Series");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Pack", b =>
