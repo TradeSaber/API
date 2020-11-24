@@ -11,8 +11,8 @@ using TradeSaber;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    [Migration("20201124091115_UpdatedUser")]
-    partial class UpdatedUser
+    [Migration("20201124101103_ReInit")]
+    partial class ReInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

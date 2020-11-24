@@ -26,10 +26,12 @@ namespace TradeSaber
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<DiscordSettings>(Configuration.GetSection(nameof(DiscordSettings)));
+            services.Configure<RaritySettings>(Configuration.GetSection(nameof(RaritySettings)));
             services.Configure<JWTSettings>(Configuration.GetSection(nameof(JWTSettings)));
             services.Configure<HTISettings>(Configuration.GetSection(nameof(HTISettings)));
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<DiscordSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<RaritySettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
 
@@ -53,7 +55,7 @@ namespace TradeSaber
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "API", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "TradeSaber", Version = "v1" });
             });
         }
 
@@ -64,7 +66,7 @@ namespace TradeSaber
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1"));
+                app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TradeSaber v1"));
             }
 
             tradeContext.Database.Migrate();
