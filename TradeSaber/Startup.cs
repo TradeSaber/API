@@ -1,5 +1,6 @@
 using System.Net.Http;
 using TradeSaber.Settings;
+using TradeSaber.Services;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
@@ -33,6 +34,7 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
 
             services.AddSingleton<HttpClient>();
+            services.AddSingleton<DiscordService>();
             services.AddDbContext<TradeContext>(builder =>
             {
                 builder.UseNpgsql(Configuration.GetConnectionString("Default"));
