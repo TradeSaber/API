@@ -1,6 +1,7 @@
 ﻿using System;
 using NodaTime;
 using TradeSaber.Models.Discord;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TradeSaber.Models
@@ -30,6 +31,13 @@ namespace TradeSaber.Models
 
         public Instant Created { get; set; }
         public Instant LastLoggedIn { get; set; }
+
+        #endregion
+
+        #region Inventory
+
+        public IList<Card> Cards { get; set; } = null!;
+        public IList<Pack> Packs { get; set; } = null!;
 
         #endregion
 

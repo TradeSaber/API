@@ -19,5 +19,6 @@ namespace TradeSaber.Models
         [Column(TypeName = "jsonb")]
         public IList<Rarity> Rarities { get; set; } = null!;
         public IList<Card> Cards { get; set; } = null!;
+        public IList<User> OwnedBy { get; set; } = null!;
     }
 }

@@ -14,7 +14,7 @@ using TradeSaber.Models.Discord;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    [Migration("20201124215331_Create")]
+    [Migration("20201124223543_Create")]
     partial class Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,6 +42,44 @@ namespace TradeSaber.Migrations
                         .HasDatabaseName("ix_card_pack_packs_id");
 
                     b.ToTable("card_pack");
+                });
+
+            modelBuilder.Entity("CardUser", b =>
+                {
+                    b.Property<Guid>("CardsID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cards_id");
+
+                    b.Property<Guid>("OwnedByID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owned_by_id");
+
+                    b.HasKey("CardsID", "OwnedByID")
+                        .HasName("pk_card_user");
+
+                    b.HasIndex("OwnedByID")
+                        .HasDatabaseName("ix_card_user_owned_by_id");
+
+                    b.ToTable("card_user");
+                });
+
+            modelBuilder.Entity("PackUser", b =>
+                {
+                    b.Property<Guid>("OwnedByID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owned_by_id");
+
+                    b.Property<Guid>("PacksID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("packs_id");
+
+                    b.HasKey("OwnedByID", "PacksID")
+                        .HasName("pk_pack_user");
+
+                    b.HasIndex("PacksID")
+                        .HasDatabaseName("ix_pack_user_packs_id");
+
+                    b.ToTable("pack_user");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Card", b =>
@@ -355,6 +393,40 @@ namespace TradeSaber.Migrations
                         .WithMany()
                         .HasForeignKey("PacksID")
                         .HasConstraintName("fk_card_pack_packs_packs_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("CardUser", b =>
+                {
+                    b.HasOne("TradeSaber.Models.Card", null)
+                        .WithMany()
+                        .HasForeignKey("CardsID")
+                        .HasConstraintName("fk_card_user_cards_cards_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradeSaber.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("OwnedByID")
+                        .HasConstraintName("fk_card_user_users_owned_by_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PackUser", b =>
+                {
+                    b.HasOne("TradeSaber.Models.User", null)
+                        .WithMany()
+                        .HasForeignKey("OwnedByID")
+                        .HasConstraintName("fk_pack_user_users_owned_by_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradeSaber.Models.Pack", null)
+                        .WithMany()
+                        .HasForeignKey("PacksID")
+                        .HasConstraintName("fk_pack_user_packs_packs_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

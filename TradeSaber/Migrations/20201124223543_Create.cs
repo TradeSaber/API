@@ -135,6 +135,30 @@ namespace TradeSaber.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "pack_user",
+                columns: table => new
+                {
+                    owned_by_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    packs_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_pack_user", x => new { x.owned_by_id, x.packs_id });
+                    table.ForeignKey(
+                        name: "fk_pack_user_packs_packs_id",
+                        column: x => x.packs_id,
+                        principalTable: "packs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_pack_user_users_owned_by_id",
+                        column: x => x.owned_by_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "card_pack",
                 columns: table => new
                 {
@@ -191,6 +215,30 @@ namespace TradeSaber.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "card_user",
+                columns: table => new
+                {
+                    cards_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    owned_by_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_card_user", x => new { x.cards_id, x.owned_by_id });
+                    table.ForeignKey(
+                        name: "fk_card_user_cards_cards_id",
+                        column: x => x.cards_id,
+                        principalTable: "cards",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_card_user_users_owned_by_id",
+                        column: x => x.owned_by_id,
+                        principalTable: "users",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "ix_card_pack_packs_id",
                 table: "card_pack",
@@ -212,9 +260,19 @@ namespace TradeSaber.Migrations
                 column: "pack_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_card_user_owned_by_id",
+                table: "card_user",
+                column: "owned_by_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_cards_series_id",
                 table: "cards",
                 column: "series_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_pack_user_packs_id",
+                table: "pack_user",
+                column: "packs_id");
 
             migrationBuilder.CreateIndex(
                 name: "ix_reference_mutation_id1",
@@ -236,16 +294,22 @@ namespace TradeSaber.Migrations
                 name: "card_reference");
 
             migrationBuilder.DropTable(
-                name: "series_reference");
+                name: "card_user");
 
             migrationBuilder.DropTable(
-                name: "users");
+                name: "pack_user");
+
+            migrationBuilder.DropTable(
+                name: "series_reference");
 
             migrationBuilder.DropTable(
                 name: "cards");
 
             migrationBuilder.DropTable(
                 name: "packs");
+
+            migrationBuilder.DropTable(
+                name: "users");
 
             migrationBuilder.DropTable(
                 name: "mutations");

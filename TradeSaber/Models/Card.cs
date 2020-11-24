@@ -19,6 +19,8 @@ namespace TradeSaber.Models
         public float? Value { get; set; }
 
         public IList<Pack> Packs { get; set; } = null!;
+        public IList<User> OwnedBy { get; set; } = null!;
+
 
         #region Equatable
 
