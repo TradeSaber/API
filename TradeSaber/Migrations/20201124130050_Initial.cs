@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
+using TradeSaber.Models;
 using TradeSaber.Models.Discord;
 
 namespace TradeSaber.Migrations
@@ -9,6 +11,23 @@ namespace TradeSaber.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "packs",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    cover_url = table.Column<string>(type: "text", nullable: false),
+                    theme = table.Column<string>(type: "text", nullable: false),
+                    count = table.Column<int>(type: "integer", nullable: false),
+                    rarities = table.Column<IList<Rarity>>(type: "jsonb", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_packs", x => x.id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "series",
                 columns: table => new
@@ -73,19 +92,93 @@ namespace TradeSaber.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "card_pack",
+                columns: table => new
+                {
+                    cards_id = table.Column<Guid>(type: "uuid", nullable: false),
+                    packs_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_card_pack", x => new { x.cards_id, x.packs_id });
+                    table.ForeignKey(
+                        name: "fk_card_pack_cards_cards_id",
+                        column: x => x.cards_id,
+                        principalTable: "cards",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "fk_card_pack_packs_packs_id",
+                        column: x => x.packs_id,
+                        principalTable: "packs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "reference",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    card_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    boost = table.Column<float>(type: "real", nullable: true),
+                    pack_id = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_reference", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_reference_cards_card_id",
+                        column: x => x.card_id,
+                        principalTable: "cards",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "fk_reference_packs_pack_id",
+                        column: x => x.pack_id,
+                        principalTable: "packs",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "ix_card_pack_packs_id",
+                table: "card_pack",
+                column: "packs_id");
+
             migrationBuilder.CreateIndex(
                 name: "ix_cards_series_id",
                 table: "cards",
                 column: "series_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_reference_card_id",
+                table: "reference",
+                column: "card_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_reference_pack_id",
+                table: "reference",
+                column: "pack_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "cards");
+                name: "card_pack");
+
+            migrationBuilder.DropTable(
+                name: "reference");
 
             migrationBuilder.DropTable(
                 name: "users");
+
+            migrationBuilder.DropTable(
+                name: "cards");
+
+            migrationBuilder.DropTable(
+                name: "packs");
 
             migrationBuilder.DropTable(
                 name: "series");

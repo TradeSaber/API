@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace TradeSaber.Models
 {
@@ -16,6 +17,8 @@ namespace TradeSaber.Models
         public string CoverURL { get; set; } = null!;
         public string BaseURL { get; set; } = null!;
         public float? Value { get; set; }
+
+        public IList<Pack> Packs { get; set; } = null!;
 
         #region Equatable
 
@@ -45,5 +48,12 @@ namespace TradeSaber.Models
         }
 
         #endregion
+
+        public class Reference
+        {
+            public Guid ID { get; set; }
+            public Card Card { get; set; } = null!;
+            public float? Boost { get; set; } = null!;
+        }
     }
 }
