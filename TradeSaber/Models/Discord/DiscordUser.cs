@@ -2,18 +2,9 @@
 
 namespace TradeSaber.Models.Discord
 {
-    public class DiscordUser
+    public record DiscordUser(string Id, string Username, string Discriminator, string Avatar)
     {
         private string _avatar;
-
-        [JsonPropertyName("id")]
-        public string Id { get; set; }
-
-        [JsonPropertyName("username")]
-        public string Username { get; set; }
-
-        [JsonPropertyName("discriminator")]
-        public string Discriminator { get; set; }
 
         [JsonPropertyName("avatar")]
         public string Avatar
