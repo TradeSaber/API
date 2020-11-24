@@ -37,7 +37,7 @@ namespace TradeSaber
             services.AddSingleton<DiscordService>();
             services.AddDbContext<TradeContext>(builder =>
             {
-                builder.UseNpgsql(Configuration.GetConnectionString("Default"));
+                builder.UseNpgsql(Configuration.GetConnectionString("Default"), o => o.UseNodaTime());
                 builder.UseSnakeCaseNamingConvention();
             });
             services.AddCors(options =>
