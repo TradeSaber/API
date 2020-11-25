@@ -6,9 +6,10 @@ namespace TradeSaber.Models
     public enum Role
     {
         None = 0,
-        Owner = 1,
-        Admin = 2,
-        Supporter = 4,
-        Trusted = 8
+        Root = 1,
+        Owner = 2,
+        Admin = 4,
+        Supporter = 8,
+        Trusted = 16
     }
 }

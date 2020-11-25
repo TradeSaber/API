@@ -10,6 +10,7 @@ namespace TradeSaber
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Series> Series { get; set; } = null!;
         public DbSet<Mutation> Mutations { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
 
         public TradeContext(DbContextOptions<TradeContext> options) : base(options)
         {
