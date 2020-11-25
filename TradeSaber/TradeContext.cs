@@ -9,6 +9,7 @@ namespace TradeSaber
         public DbSet<Pack> Packs { get; set; } = null!;
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Series> Series { get; set; } = null!;
+        public DbSet<Session> Sessions { get; set; } = null!;
         public DbSet<Mutation> Mutations { get; set; } = null!;
         public DbSet<Transaction> Transactions { get; set; } = null!;
 

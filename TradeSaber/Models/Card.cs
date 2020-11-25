@@ -21,7 +21,6 @@ namespace TradeSaber.Models
         public IList<Pack> Packs { get; set; } = null!;
         public IList<User> OwnedBy { get; set; } = null!;
 
-
         #region Equatable
 
         public bool Equals(Card? other)

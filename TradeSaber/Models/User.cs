@@ -24,6 +24,7 @@ namespace TradeSaber.Models
         public int Level { get; set; } = 0;
         public float TirCoin { get; set; } = 0f;
         public long Experience { get; set; } = 0;
+        public IList<Session> Sessions { get; set; } = null!;
 
         #endregion
 

@@ -9,6 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TradeSaber;
 using TradeSaber.Models;
 using TradeSaber.Models.Discord;
+using static TradeSaber.Models.Session;
 
 namespace TradeSaber.Migrations
 {
@@ -131,6 +132,10 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("series_id");
 
+                    b.Property<Guid?>("TransactionID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transaction_id");
+
                     b.Property<float?>("Value")
                         .HasColumnType("real")
                         .HasColumnName("value");
@@ -140,6 +145,9 @@ namespace TradeSaber.Migrations
 
                     b.HasIndex("SeriesID")
                         .HasDatabaseName("ix_cards_series_id");
+
+                    b.HasIndex("TransactionID")
+                        .HasDatabaseName("ix_cards_transaction_id");
 
                     b.ToTable("cards");
                 });
@@ -248,12 +256,19 @@ namespace TradeSaber.Migrations
                         .HasColumnType("text")
                         .HasColumnName("theme");
 
+                    b.Property<Guid?>("TransactionID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transaction_id");
+
                     b.Property<float?>("Value")
                         .HasColumnType("real")
                         .HasColumnName("value");
 
                     b.HasKey("ID")
                         .HasName("pk_packs");
+
+                    b.HasIndex("TransactionID")
+                        .HasDatabaseName("ix_packs_transaction_id");
 
                     b.ToTable("packs");
                 });
@@ -330,6 +345,74 @@ namespace TradeSaber.Migrations
                         .HasDatabaseName("ix_reference_series_id");
 
                     b.ToTable("series_reference");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Session", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Dictionary<Level, Score>>("Scores")
+                        .IsRequired()
+                        .HasColumnType("jsonb")
+                        .HasColumnName("scores");
+
+                    b.Property<Instant>("StartTime")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("start_time");
+
+                    b.Property<Guid>("UserID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("ID")
+                        .HasName("pk_sessions");
+
+                    b.HasIndex("UserID")
+                        .HasDatabaseName("ix_sessions_user_id");
+
+                    b.ToTable("sessions");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Transaction", b =>
+                {
+                    b.Property<Guid>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<Guid?>("ReceiverID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("receiver_id");
+
+                    b.Property<Guid?>("SenderID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("sender_id");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer")
+                        .HasColumnName("status");
+
+                    b.Property<Instant>("Time")
+                        .HasColumnType("timestamp")
+                        .HasColumnName("time");
+
+                    b.Property<float?>("Tir")
+                        .HasColumnType("real")
+                        .HasColumnName("tir");
+
+                    b.HasKey("ID")
+                        .HasName("pk_transactions");
+
+                    b.HasIndex("ReceiverID")
+                        .HasDatabaseName("ix_transactions_receiver_id");
+
+                    b.HasIndex("SenderID")
+                        .HasDatabaseName("ix_transactions_sender_id");
+
+                    b.ToTable("transactions");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.User", b =>
@@ -438,6 +521,11 @@ namespace TradeSaber.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("TradeSaber.Models.Transaction", null)
+                        .WithMany("Cards")
+                        .HasForeignKey("TransactionID")
+                        .HasConstraintName("fk_cards_transactions_transaction_id");
+
                     b.Navigation("Series");
                 });
 
@@ -461,6 +549,14 @@ namespace TradeSaber.Migrations
                     b.Navigation("Card");
                 });
 
+            modelBuilder.Entity("TradeSaber.Models.Pack", b =>
+                {
+                    b.HasOne("TradeSaber.Models.Transaction", null)
+                        .WithMany("Packs")
+                        .HasForeignKey("TransactionID")
+                        .HasConstraintName("fk_packs_transactions_transaction_id");
+                });
+
             modelBuilder.Entity("TradeSaber.Models.Series+Reference", b =>
                 {
                     b.HasOne("TradeSaber.Models.Mutation", null)
@@ -474,6 +570,35 @@ namespace TradeSaber.Migrations
                         .HasConstraintName("fk_reference_series_series_id");
 
                     b.Navigation("Series");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Session", b =>
+                {
+                    b.HasOne("TradeSaber.Models.User", "User")
+                        .WithMany("Sessions")
+                        .HasForeignKey("UserID")
+                        .HasConstraintName("fk_sessions_users_user_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Transaction", b =>
+                {
+                    b.HasOne("TradeSaber.Models.User", "Receiver")
+                        .WithMany()
+                        .HasForeignKey("ReceiverID")
+                        .HasConstraintName("fk_transactions_users_receiver_id");
+
+                    b.HasOne("TradeSaber.Models.User", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderID")
+                        .HasConstraintName("fk_transactions_users_sender_id");
+
+                    b.Navigation("Receiver");
+
+                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Mutation", b =>
@@ -491,6 +616,18 @@ namespace TradeSaber.Migrations
             modelBuilder.Entity("TradeSaber.Models.Series", b =>
                 {
                     b.Navigation("Cards");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Transaction", b =>
+                {
+                    b.Navigation("Cards");
+
+                    b.Navigation("Packs");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.User", b =>
+                {
+                    b.Navigation("Sessions");
                 });
 #pragma warning restore 612, 618
         }
