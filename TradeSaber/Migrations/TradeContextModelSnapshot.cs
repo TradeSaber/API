@@ -354,6 +354,10 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<float>("Length")
+                        .HasColumnType("real")
+                        .HasColumnName("length");
+
                     b.Property<Dictionary<Level, Score>>("Scores")
                         .IsRequired()
                         .HasColumnType("jsonb")

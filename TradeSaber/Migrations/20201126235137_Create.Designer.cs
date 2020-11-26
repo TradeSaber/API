@@ -15,7 +15,7 @@ using static TradeSaber.Models.Session;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    [Migration("20201125064733_Create")]
+    [Migration("20201126235137_Create")]
     partial class Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -355,6 +355,10 @@ namespace TradeSaber.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid")
                         .HasColumnName("id");
+
+                    b.Property<float>("Length")
+                        .HasColumnType("real")
+                        .HasColumnName("length");
 
                     b.Property<Dictionary<Level, Score>>("Scores")
                         .IsRequired()

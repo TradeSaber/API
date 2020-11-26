@@ -8,6 +8,7 @@ namespace TradeSaber.Models
     public class Session
     {
         public Guid ID { get; set; }
+        public float Length { get; set; } = 0;
         public Instant StartTime { get; set; }
         public User User { get; set; } = null!;
 

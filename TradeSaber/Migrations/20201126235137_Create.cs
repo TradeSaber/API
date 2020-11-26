@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
 using TradeSaber.Models;
 using TradeSaber.Models.Discord;
-using System.Collections.Generic;
 using static TradeSaber.Models.Session;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TradeSaber.Migrations
 {
@@ -94,6 +94,7 @@ namespace TradeSaber.Migrations
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
+                    length = table.Column<float>(type: "real", nullable: false),
                     start_time = table.Column<Instant>(type: "timestamp", nullable: false),
                     user_id = table.Column<Guid>(type: "uuid", nullable: false),
                     scores = table.Column<Dictionary<Level, Score>>(type: "jsonb", nullable: false)
