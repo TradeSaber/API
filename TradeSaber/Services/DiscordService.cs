@@ -62,5 +62,21 @@ namespace TradeSaber.Services
             _logger.LogWarning("Could not get user profile. {ReasonPhrase}", response.ReasonPhrase);
             return null;
         }
+
+        public async Task<DiscordUser?> GetProfileFromID(string id)
+        {
+            _logger.LogDebug("Getting user profile ({ID})", id);
+            _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bot", _discordSettings.Token);
+            HttpResponseMessage response = await _client.GetAsync(_discordSettings.URL + "/users/" + id);
+            if (response.IsSuccessStatusCode)
+            {
+                string responseString = await response.Content.ReadAsStringAsync();
+                DiscordUser? discordUser = JsonSerializer.Deserialize<DiscordUser>(responseString);
+                _logger.LogDebug("User Profile {Username}#{Discriminator} Found", discordUser?.Username, discordUser?.Discriminator);
+                return discordUser;
+            }
+            _logger.LogWarning("Could not get user profile. {ReasonPhrase}", response.ReasonPhrase);
+            return null;
+        }
     }
 }
