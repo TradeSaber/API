@@ -55,7 +55,7 @@ namespace TradeSaber.Services
             if (response.IsSuccessStatusCode)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
-                DiscordUser? discordUser = JsonSerializer.Deserialize<DiscordUser>(responseString);
+                DiscordUser? discordUser = JsonSerializer.Deserialize<DiscordUser>(responseString, new JsonSerializerOptions(JsonSerializerDefaults.Web));
                 _logger.LogDebug("User Profile {Username}#{Discriminator} Found", discordUser?.Username, discordUser?.Discriminator);
                 return discordUser;
             }
@@ -71,7 +71,7 @@ namespace TradeSaber.Services
             if (response.IsSuccessStatusCode)
             {
                 string responseString = await response.Content.ReadAsStringAsync();
-                DiscordUser? discordUser = JsonSerializer.Deserialize<DiscordUser>(responseString);
+                DiscordUser? discordUser = JsonSerializer.Deserialize<DiscordUser>(responseString, new JsonSerializerOptions(JsonSerializerDefaults.Web));
                 _logger.LogDebug("User Profile {Username}#{Discriminator} Found", discordUser?.Username, discordUser?.Discriminator);
                 return discordUser;
             }

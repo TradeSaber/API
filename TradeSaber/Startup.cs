@@ -1,6 +1,7 @@
 using System.Net.Http;
 using TradeSaber.Settings;
 using TradeSaber.Services;
+using TradeSaber.Authorization;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using NodaTime;
 
 namespace TradeSaber
 {
@@ -36,8 +38,10 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
 
+            services.AddHttpContextAccessor();
             services.AddSingleton<HttpClient>();
             services.AddSingleton<DiscordService>();
+            services.AddSingleton<IClock>(SystemClock.Instance);
             services.AddDbContext<TradeContext>(builder =>
             {
                 builder.UseNpgsql(Configuration.GetConnectionString("Default"), o => o.UseNodaTime());
@@ -80,6 +84,8 @@ namespace TradeSaber
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
+            
+            app.UseMiddleware<JWTValidator>();
 
             logger.LogInformation("Mapping Endpoints...");
             app.UseEndpoints(endpoints =>

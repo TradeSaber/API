@@ -1,5 +1,7 @@
 ﻿using TradeSaber.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using System;
 
 namespace TradeSaber
 {
@@ -12,6 +14,13 @@ namespace TradeSaber
         public DbSet<Session> Sessions { get; set; } = null!;
         public DbSet<Mutation> Mutations { get; set; } = null!;
         public DbSet<Transaction> Transactions { get; set; } = null!;
+
+        public async Task<User?> GetUser(Guid id)
+        {
+            return await Users.FirstOrDefaultAsync(u => u.ID == id);
+        }
+
+        #region Initialization
 
         public TradeContext(DbContextOptions<TradeContext> options) : base(options)
         {
@@ -33,5 +42,7 @@ namespace TradeSaber
             modelBuilder.Entity<Mutation>().HasMany(mu => mu.Series);
             modelBuilder.Entity<Mutation>().HasMany(mu => mu.Cards);
         }
+
+        #endregion
     }
 }

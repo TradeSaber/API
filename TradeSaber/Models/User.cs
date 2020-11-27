@@ -59,14 +59,14 @@ namespace TradeSaber.Models
             return ID.GetHashCode();
         }
 
-        public static bool operator !=(User u1, User u2)
+        public static bool operator !=(User? u1, User? u2)
         {
             return !(u1 == u2);
         }
 
-        public static bool operator ==(User u1, User u2)
+        public static bool operator ==(User? u1, User? u2)
         {
-            return u1 == u2 || u1.Equals(u2);
+            return u1?.Equals(u2) ?? false;
         }
 
         #endregion
