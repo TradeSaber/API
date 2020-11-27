@@ -24,7 +24,7 @@ namespace TradeSaber.Models
         public int Level { get; set; } = 0;
         public float TirCoin { get; set; } = 0f;
         public long Experience { get; set; } = 0;
-        public IList<Session> Sessions { get; set; } = null!;
+        public IList<Session> Sessions { get; set; } = new List<Session>();
 
         #endregion
 
@@ -37,8 +37,8 @@ namespace TradeSaber.Models
 
         #region Inventory
 
-        public IList<Card> Cards { get; set; } = null!;
-        public IList<Pack> Packs { get; set; } = null!;
+        public IList<Card> Cards { get; set; } = new List<Card>();
+        public IList<Pack> Packs { get; set; } = new List<Pack>();
 
         #endregion
 

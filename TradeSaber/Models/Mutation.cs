@@ -11,7 +11,7 @@ namespace TradeSaber.Models
         public string Name { get; set; } = null!;
         public float? GlobalXPBoost { get; set; }
         public float? GlobalTirBoost { get; set; }
-        public IList<Card.Reference> Cards { get; set; } = null!;
-        public IList<Series.Reference> Series { get; set; } = null!;
+        public IList<Card.Reference> Cards { get; set; } = new List<Card.Reference>();
+        public IList<Series.Reference> Series { get; set; } = new List<Series.Reference>();
     }
 }

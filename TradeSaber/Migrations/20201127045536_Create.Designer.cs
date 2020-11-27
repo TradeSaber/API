@@ -15,7 +15,7 @@ using static TradeSaber.Models.Session;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    [Migration("20201126235137_Create")]
+    [Migration("20201127045536_Create")]
     partial class Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -249,7 +249,6 @@ namespace TradeSaber.Migrations
                         .HasColumnName("name");
 
                     b.Property<IList<Rarity>>("Rarities")
-                        .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("rarities");
 

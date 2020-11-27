@@ -12,8 +12,8 @@ namespace TradeSaber.Models
         public TStatus Status { get; set; }
         public User Sender { get; set; } = null!;
         public User Receiver { get; set; } = null!;
-        public IList<Card> Cards { get; set; } = null!;
-        public IList<Pack> Packs { get; set; } = null!;
+        public IList<Card> Cards { get; set; } = new List<Card>();
+        public IList<Pack> Packs { get; set; } = new List<Pack>();
 
         public enum TStatus
         {

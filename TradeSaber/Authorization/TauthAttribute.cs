@@ -14,7 +14,7 @@ namespace TradeSaber.Authorization
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var userItem = (User?)context.HttpContext.Items["User"];
-            if (userItem == null || !userItem.Role.HasFlag(Role))
+            if (userItem is null || !userItem.Role.HasFlag(Role))
             {
                 context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
             }

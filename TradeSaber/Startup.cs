@@ -13,6 +13,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime;
+using NodaTime.Serialization.SystemTextJson;
+using System.Text.Json;
 
 namespace TradeSaber
 {
@@ -57,7 +59,7 @@ namespace TradeSaber
                 });
             });
 
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(c => c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Bcl));
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TradeSaber", Version = "v1" });

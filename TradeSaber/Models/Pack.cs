@@ -14,11 +14,11 @@ namespace TradeSaber.Models
         public float? Value { get; set; }
         public int Count { get; set; }
 
-        public IList<Card.Reference> CardPool { get; set; } = null!;
+        public IList<Card.Reference> CardPool { get; set; } = new List<Card.Reference>();
 
         [Column(TypeName = "jsonb")]
-        public IList<Rarity> Rarities { get; set; } = null!;
-        public IList<Card> Cards { get; set; } = null!;
-        public IList<User> OwnedBy { get; set; } = null!;
+        public IList<Rarity>? Rarities { get; set; } = null;
+        public IList<Card> Cards { get; set; } = new List<Card>();
+        public IList<User> OwnedBy { get; set; } = new List<User>();
     }
 }

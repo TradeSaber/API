@@ -18,8 +18,8 @@ namespace TradeSaber.Models
         public string BaseURL { get; set; } = null!;
         public float? Value { get; set; }
 
-        public IList<Pack> Packs { get; set; } = null!;
-        public IList<User> OwnedBy { get; set; } = null!;
+        public IList<Pack> Packs { get; set; } = new List<Pack>();
+        public IList<User> OwnedBy { get; set; } = new List<User>();
 
         #region Equatable
 

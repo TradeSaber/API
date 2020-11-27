@@ -184,7 +184,7 @@ namespace TradeSaber.Migrations
                     theme = table.Column<string>(type: "text", nullable: false),
                     value = table.Column<float>(type: "real", nullable: true),
                     count = table.Column<int>(type: "integer", nullable: false),
-                    rarities = table.Column<IList<Rarity>>(type: "jsonb", nullable: false),
+                    rarities = table.Column<IList<Rarity>>(type: "jsonb", nullable: true),
                     transaction_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>

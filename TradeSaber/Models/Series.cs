@@ -13,7 +13,7 @@ namespace TradeSaber.Models
         public string IconURL { get; set; } = null!;
         public string BannerURL { get; set; } = null!;
 
-        public IList<Card> Cards { get; set; } = null!;
+        public IList<Card> Cards { get; set; } = new List<Card>();
 
         public class Reference
         {

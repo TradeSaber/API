@@ -247,7 +247,6 @@ namespace TradeSaber.Migrations
                         .HasColumnName("name");
 
                     b.Property<IList<Rarity>>("Rarities")
-                        .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("rarities");
 
