@@ -1,4 +1,7 @@
+using NodaTime;
+using System.IO;
 using System.Net.Http;
+using System.Reflection;
 using TradeSaber.Settings;
 using TradeSaber.Services;
 using TradeSaber.Authorization;
@@ -12,9 +15,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
-using System.Text.Json;
+using System;
 
 namespace TradeSaber
 {
@@ -63,6 +65,11 @@ namespace TradeSaber
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TradeSaber", Version = "v1" });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

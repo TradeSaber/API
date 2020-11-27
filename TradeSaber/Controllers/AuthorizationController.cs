@@ -19,6 +19,7 @@ namespace TradeSaber.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class AuthorizationController : ControllerBase
     {
         private readonly IClock _clock;
@@ -38,13 +39,23 @@ namespace TradeSaber.Controllers
             _discordSettings = discordSettings;
         }
 
+        /// <summary>
+        /// Redirects to Discord's OAuth2 Flow.
+        /// </summary>
         [HttpGet]
+        [ProducesResponseType(StatusCodes.Status308PermanentRedirect)]
         public IActionResult Authenticate()
         {
             return Redirect($"{_discordSettings.URL}/oauth2/authorize?response_type=code&client_id={_discordSettings.ID}&scope=identify&redirect_uri={_discordSettings.RedirectURL}");
         }
 
+        /// <summary>
+        /// Callback for Discord's OAuth2 Flow.
+        /// </summary>
+        /// <param name="code">The user access code from authorization flow.</param>
         [HttpGet("callback")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Callback([FromQuery] string code)
         {
             string? accessToken = await _discordService.GetAccessToken(code);
@@ -113,9 +124,15 @@ namespace TradeSaber.Controllers
             return Ok(new { token });
         }
 
+        /// <summary>
+        /// Gets the current user based on the authorization bearer token.
+        /// </summary>
         [Tauth]
         [HttpGet("@me")]
-        public IActionResult GetSelf()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        public ActionResult<User> GetSelf()
         {
             if (HttpContext.Items["User"] is not User user)
             {

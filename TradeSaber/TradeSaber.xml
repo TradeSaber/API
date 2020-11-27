@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TradeSaber</name>
+    </assembly>
+    <members>
+        <member name="M:TradeSaber.Controllers.AuthorizationController.Authenticate">
+            <summary>
+            Redirects to Discord's OAuth2 Flow.
+            </summary>
+        </member>
+        <member name="M:TradeSaber.Controllers.AuthorizationController.Callback(System.String)">
+            <summary>
+            Callback for Discord's OAuth2 Flow.
+            </summary>
+            <param name="code">The user access code from authorization flow.</param>
+        </member>
+        <member name="M:TradeSaber.Controllers.AuthorizationController.GetSelf">
+            <summary>
+            Gets the current user based on the authorization bearer token.
+            </summary>
+        </member>
+    </members>
+</doc>
