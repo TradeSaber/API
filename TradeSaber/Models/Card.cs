@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NodaTime;
+using System;
 using System.Collections.Generic;
 
 namespace TradeSaber.Models
@@ -55,6 +56,7 @@ namespace TradeSaber.Models
             public Guid ID { get; set; }
             public Card Card { get; set; } = null!;
             public float? Boost { get; set; } = null!;
+            public bool Guaranteed { get; set; }
         }
     }
 }

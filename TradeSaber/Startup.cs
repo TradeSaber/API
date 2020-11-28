@@ -1,3 +1,4 @@
+using System;
 using NodaTime;
 using System.IO;
 using System.Net.Http;
@@ -16,7 +17,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Serialization.SystemTextJson;
-using System;
 
 namespace TradeSaber
 {
@@ -42,8 +42,10 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
 
+            services.AddSingleton<Random>();
             services.AddHttpContextAccessor();
             services.AddSingleton<HttpClient>();
+            services.AddTransient<CardDispatcher>();
             services.AddSingleton<DiscordService>();
             services.AddSingleton<IClock>(SystemClock.Instance);
             services.AddDbContext<TradeContext>(builder =>

@@ -20,5 +20,59 @@
             Gets the current user based on the authorization bearer token.
             </summary>
         </member>
+        <member name="M:TradeSaber.Services.CardDispatcher.Roll(System.Nullable{TradeSaber.Models.Rarity})">
+            <summary>
+            Rolls a completely random card from the natural card pool.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TradeSaber.Services.CardDispatcher.RollFromPool(System.Collections.Generic.IEnumerable{TradeSaber.Models.Card},System.Int32,System.Collections.Generic.IEnumerable{TradeSaber.Models.Card.Reference})">
+            <summary>
+            Rolls a card based on probability from a collection of cards.
+            </summary>
+            <param name="cards">The cards to use as the pool.</param>
+            <param name="pulsey">The Pulsey value for this set of cards.</param>
+            <param name="references">Any potential card references</param>
+            <remarks>
+            This can end up in an deadlocked recursive loop if every card in the inserted pool has a limited set of prints.
+            The chance of this happening is so incredibly low, I'm not factoring in a fix for it.
+            </remarks>
+            <returns>The selected (probability-based) card.</returns>
+        </member>
+        <member name="M:TradeSaber.Services.CardDispatcher.CanPrint(TradeSaber.Models.Card)">
+            <summary>
+            Checks to see if a card can be printed.
+            </summary>
+            <remarks>
+            This can technically cause a singular pack to create more than the maximum number of a card since it doesn't
+            factor in the other cards that are being generated. I'm leaving this in cause I think it'd be cool if an
+            "impossible card" were to appear (although the chance is incredibly rare, it would make the card rare as well).
+            </remarks>
+            <param name="card">The card to check availability for.</param>
+            <returns></returns>
+        </member>
+        <member name="M:TradeSaber.Services.CardDispatcher.RepresentationValueConstant(System.Collections.Generic.IEnumerable{TradeSaber.Models.Card},TradeSaber.Models.Card.Reference[])">
+            <summary>
+            Calculates what I'm calling the "Pulsey" number, the correct integer needed to multiply a set of
+            float values to make them all integers without destroying their ratios.
+            </summary>
+            <param name="cards">The cards.</param>
+            <param name="references">Card references for boost probability calculation.</param>
+            <returns>The representation value.</returns>
+        </member>
+        <member name="M:TradeSaber.Services.CardDispatcher.MaximumPlaceCount(System.Collections.Generic.IEnumerable{System.Single})">
+            <summary>
+            Gets the highest number of decimal places from a set of numbers.
+            </summary>
+            <param name="values">The float numbers.</param>
+            <returns>The highest place count in the numbers.</returns>
+        </member>
+        <member name="M:TradeSaber.Services.CardDispatcher.Places(System.Single)">
+            <summary>
+            Counts the amount of decimal places in a float.
+            </summary>
+            <param name="value">The float to count.</param>
+            <returns>The amount of places in the float.</returns>
+        </member>
     </members>
 </doc>
