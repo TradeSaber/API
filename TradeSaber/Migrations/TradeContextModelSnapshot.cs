@@ -24,25 +24,6 @@ namespace TradeSaber.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.0");
 
-            modelBuilder.Entity("CardPack", b =>
-                {
-                    b.Property<Guid>("CardsID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("cards_id");
-
-                    b.Property<Guid>("PacksID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("packs_id");
-
-                    b.HasKey("CardsID", "PacksID")
-                        .HasName("pk_card_pack");
-
-                    b.HasIndex("PacksID")
-                        .HasDatabaseName("ix_card_pack_packs_id");
-
-                    b.ToTable("card_pack");
-                });
-
             modelBuilder.Entity("CardUser", b =>
                 {
                     b.Property<Guid>("CardsID")
@@ -167,6 +148,10 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("card_id");
 
+                    b.Property<bool>("Guaranteed")
+                        .HasColumnType("boolean")
+                        .HasColumnName("guaranteed");
+
                     b.Property<Guid?>("MutationID")
                         .HasColumnType("uuid")
                         .HasColumnName("mutation_id");
@@ -227,6 +212,10 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
+                    b.Property<Guid?>("CardID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("card_id");
+
                     b.Property<int>("Count")
                         .HasColumnType("integer")
                         .HasColumnName("count");
@@ -266,6 +255,9 @@ namespace TradeSaber.Migrations
                     b.HasKey("ID")
                         .HasName("pk_packs");
 
+                    b.HasIndex("CardID")
+                        .HasDatabaseName("ix_packs_card_id");
+
                     b.HasIndex("TransactionID")
                         .HasDatabaseName("ix_packs_transaction_id");
 
@@ -279,20 +271,15 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<string>("BannerURL")
+                    b.Property<string>("CoverURL")
                         .IsRequired()
                         .HasColumnType("text")
-                        .HasColumnName("banner_url");
+                        .HasColumnName("cover_url");
 
                     b.Property<string>("Description")
                         .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("description");
-
-                    b.Property<string>("IconURL")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("icon_url");
 
                     b.Property<string>("MainColor")
                         .IsRequired()
@@ -305,7 +292,6 @@ namespace TradeSaber.Migrations
                         .HasColumnName("name");
 
                     b.Property<string>("SubColor")
-                        .IsRequired()
                         .HasColumnType("text")
                         .HasColumnName("sub_color");
 
@@ -464,23 +450,6 @@ namespace TradeSaber.Migrations
                     b.ToTable("users");
                 });
 
-            modelBuilder.Entity("CardPack", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Card", null)
-                        .WithMany()
-                        .HasForeignKey("CardsID")
-                        .HasConstraintName("fk_card_pack_cards_cards_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TradeSaber.Models.Pack", null)
-                        .WithMany()
-                        .HasForeignKey("PacksID")
-                        .HasConstraintName("fk_card_pack_packs_packs_id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("CardUser", b =>
                 {
                     b.HasOne("TradeSaber.Models.Card", null)
@@ -554,6 +523,11 @@ namespace TradeSaber.Migrations
 
             modelBuilder.Entity("TradeSaber.Models.Pack", b =>
                 {
+                    b.HasOne("TradeSaber.Models.Card", null)
+                        .WithMany("Packs")
+                        .HasForeignKey("CardID")
+                        .HasConstraintName("fk_packs_cards_card_id");
+
                     b.HasOne("TradeSaber.Models.Transaction", null)
                         .WithMany("Packs")
                         .HasForeignKey("TransactionID")
@@ -602,6 +576,11 @@ namespace TradeSaber.Migrations
                     b.Navigation("Receiver");
 
                     b.Navigation("Sender");
+                });
+
+            modelBuilder.Entity("TradeSaber.Models.Card", b =>
+                {
+                    b.Navigation("Packs");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Mutation", b =>

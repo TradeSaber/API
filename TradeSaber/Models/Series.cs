@@ -9,9 +9,8 @@ namespace TradeSaber.Models
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string MainColor { get; set; } = null!;
-        public string SubColor { get; set; } = null!;
-        public string IconURL { get; set; } = null!;
-        public string BannerURL { get; set; } = null!;
+        public string? SubColor { get; set; } = null!;
+        public string CoverURL { get; set; } = null!;
 
         public IList<Card> Cards { get; set; } = new List<Card>();
 

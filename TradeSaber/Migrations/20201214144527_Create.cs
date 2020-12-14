@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
 using TradeSaber.Models;
 using TradeSaber.Models.Discord;
+using System.Collections.Generic;
 using static TradeSaber.Models.Session;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TradeSaber.Migrations
 {
@@ -35,9 +35,8 @@ namespace TradeSaber.Migrations
                     name = table.Column<string>(type: "text", nullable: false),
                     description = table.Column<string>(type: "text", nullable: false),
                     main_color = table.Column<string>(type: "text", nullable: false),
-                    sub_color = table.Column<string>(type: "text", nullable: false),
-                    icon_url = table.Column<string>(type: "text", nullable: false),
-                    banner_url = table.Column<string>(type: "text", nullable: false)
+                    sub_color = table.Column<string>(type: "text", nullable: true),
+                    cover_url = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -174,31 +173,6 @@ namespace TradeSaber.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "packs",
-                columns: table => new
-                {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    name = table.Column<string>(type: "text", nullable: false),
-                    description = table.Column<string>(type: "text", nullable: false),
-                    cover_url = table.Column<string>(type: "text", nullable: false),
-                    theme = table.Column<string>(type: "text", nullable: false),
-                    value = table.Column<float>(type: "real", nullable: true),
-                    count = table.Column<int>(type: "integer", nullable: false),
-                    rarities = table.Column<IList<Rarity>>(type: "jsonb", nullable: true),
-                    transaction_id = table.Column<Guid>(type: "uuid", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("pk_packs", x => x.id);
-                    table.ForeignKey(
-                        name: "fk_packs_transactions_transaction_id",
-                        column: x => x.transaction_id,
-                        principalTable: "transactions",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "card_user",
                 columns: table => new
                 {
@@ -223,27 +197,35 @@ namespace TradeSaber.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "card_pack",
+                name: "packs",
                 columns: table => new
                 {
-                    cards_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    packs_id = table.Column<Guid>(type: "uuid", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    description = table.Column<string>(type: "text", nullable: false),
+                    cover_url = table.Column<string>(type: "text", nullable: false),
+                    theme = table.Column<string>(type: "text", nullable: false),
+                    value = table.Column<float>(type: "real", nullable: true),
+                    count = table.Column<int>(type: "integer", nullable: false),
+                    rarities = table.Column<IList<Rarity>>(type: "jsonb", nullable: true),
+                    card_id = table.Column<Guid>(type: "uuid", nullable: true),
+                    transaction_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("pk_card_pack", x => new { x.cards_id, x.packs_id });
+                    table.PrimaryKey("pk_packs", x => x.id);
                     table.ForeignKey(
-                        name: "fk_card_pack_cards_cards_id",
-                        column: x => x.cards_id,
+                        name: "fk_packs_cards_card_id",
+                        column: x => x.card_id,
                         principalTable: "cards",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "fk_card_pack_packs_packs_id",
-                        column: x => x.packs_id,
-                        principalTable: "packs",
+                        name: "fk_packs_transactions_transaction_id",
+                        column: x => x.transaction_id,
+                        principalTable: "transactions",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -253,6 +235,7 @@ namespace TradeSaber.Migrations
                     id = table.Column<Guid>(type: "uuid", nullable: false),
                     card_id = table.Column<Guid>(type: "uuid", nullable: true),
                     boost = table.Column<float>(type: "real", nullable: true),
+                    guaranteed = table.Column<bool>(type: "boolean", nullable: false),
                     mutation_id = table.Column<Guid>(type: "uuid", nullable: true),
                     pack_id = table.Column<Guid>(type: "uuid", nullable: true)
                 },
@@ -304,11 +287,6 @@ namespace TradeSaber.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "ix_card_pack_packs_id",
-                table: "card_pack",
-                column: "packs_id");
-
-            migrationBuilder.CreateIndex(
                 name: "ix_reference_card_id",
                 table: "card_reference",
                 column: "card_id");
@@ -344,6 +322,11 @@ namespace TradeSaber.Migrations
                 column: "packs_id");
 
             migrationBuilder.CreateIndex(
+                name: "ix_packs_card_id",
+                table: "packs",
+                column: "card_id");
+
+            migrationBuilder.CreateIndex(
                 name: "ix_packs_transaction_id",
                 table: "packs",
                 column: "transaction_id");
@@ -377,9 +360,6 @@ namespace TradeSaber.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "card_pack");
-
-            migrationBuilder.DropTable(
                 name: "card_reference");
 
             migrationBuilder.DropTable(
@@ -395,13 +375,13 @@ namespace TradeSaber.Migrations
                 name: "sessions");
 
             migrationBuilder.DropTable(
-                name: "cards");
-
-            migrationBuilder.DropTable(
                 name: "packs");
 
             migrationBuilder.DropTable(
                 name: "mutations");
+
+            migrationBuilder.DropTable(
+                name: "cards");
 
             migrationBuilder.DropTable(
                 name: "series");

@@ -11,6 +11,8 @@ namespace TradeSaber.Authorization
     {
         public Role Role { get; set; } = Role.None;
 
+        public TauthAttribute(Role role = Role.None) => Role = role;
+        
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var userItem = (User?)context.HttpContext.Items["User"];

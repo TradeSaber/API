@@ -15,8 +15,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using NodaTime.Serialization.SystemTextJson;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace TradeSaber
 {
@@ -45,14 +45,17 @@ namespace TradeSaber
             services.AddSingleton<Random>();
             services.AddHttpContextAccessor();
             services.AddSingleton<HttpClient>();
+            services.AddSingleton<FileManager>();
             services.AddTransient<CardDispatcher>();
             services.AddSingleton<DiscordService>();
             services.AddSingleton<IClock>(SystemClock.Instance);
-            services.AddDbContext<TradeContext>(builder =>
+            
+            services.AddDbContext<TradeContext>(optionsBuilder =>
             {
-                builder.UseNpgsql(Configuration.GetConnectionString("Default"), o => o.UseNodaTime());
-                builder.UseSnakeCaseNamingConvention();
+                optionsBuilder.UseNpgsql(Configuration.GetConnectionString("Default"), o => o.UseNodaTime());
+                optionsBuilder.UseSnakeCaseNamingConvention();
             });
+
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(opt =>
