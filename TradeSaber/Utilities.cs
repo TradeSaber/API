@@ -49,6 +49,21 @@ namespace TradeSaber
             await file.CopyToAsync(stream);
         }
 
+        public static async Task<string> SaveImageToRoot(this IFormFile file, HashType type = HashType.SHA256)
+        {
+            var endPath = Path.Combine("Images");
+            var frontPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+            var fileName = $"{ComputeHash(file.OpenReadStream(), type)}.png";
+            var savePath = Path.Combine(frontPath, endPath);
+            var fullPath = Path.Combine(savePath, fileName);
+
+            Directory.CreateDirectory(savePath);
+            using Stream stream = File.Create(fullPath);
+            await file.CopyToAsync(stream);
+
+            return Path.Combine(endPath, fileName);
+        }
+
         public static bool VerifyImageFileExtension(Stream stream, string extension)
         {
             if (!_fileSignatures.TryGetValue(extension, out List<byte[]>? signatures))

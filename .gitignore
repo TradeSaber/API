@@ -10,6 +10,7 @@
 *.userosscache
 *.sln.docstates
 
+wwwroot/
 Images/
 Files/
 Logs/

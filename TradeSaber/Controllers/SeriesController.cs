@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Linq;
 using TradeSaber.Models;
-using TradeSaber.Services;
 using System.Threading.Tasks;
 using TradeSaber.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,14 +13,12 @@ namespace TradeSaber.Controllers
     [ApiController]
     public class SeriesController : ControllerBase
     {
-        private readonly FileManager _fileManager;
         private readonly TradeContext _tradeContext;
         private readonly ILogger<SeriesController> _logger;
 
-        public SeriesController(ILogger<SeriesController> logger, FileManager fileManager, TradeContext tradeContext)
+        public SeriesController(ILogger<SeriesController> logger, TradeContext tradeContext)
         {
             _logger = logger;
-            _fileManager = fileManager;
             _tradeContext = tradeContext;
         }
 
@@ -54,9 +52,14 @@ namespace TradeSaber.Controllers
                 return BadRequest(new { error });
             }
 
+            if (_tradeContext.Series.Any(s => s.Name.ToLower() == upload.Name.ToLower()))
+            {
+                string error = "Series name already exists";
+                return BadRequest(new { error });
+            }
             Guid id = Guid.NewGuid();
             _logger.LogInformation("Processing Cover Image");
-            string? path = await _fileManager.SaveImage(nameof(Series), id, upload.Cover.FileName, upload.Cover.OpenReadStream());
+            string? path = await upload.Cover.SaveImageToRoot();
             if (path == null)
             {
                 string error = "Error occurred when uploading cover image.";
@@ -69,7 +72,7 @@ namespace TradeSaber.Controllers
                 SubColor = upload.SubColor,
                 MainColor = upload.MainColor,
                 Description = upload.Description,
-                CoverURL = $"/{(path.Replace("\\", "/").ToLower())}",
+                CoverURL = $"/{path.Replace("\\", "/").ToLower()}",
             };
             _logger.LogDebug("Adding new series {Name} to the database.", series.Name);
             _tradeContext.Series.Add(series);

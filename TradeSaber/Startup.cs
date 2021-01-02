@@ -7,6 +7,7 @@ using TradeSaber.Settings;
 using TradeSaber.Services;
 using TradeSaber.Authorization;
 using Microsoft.OpenApi.Models;
+using SixLabors.ImageSharp.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -14,9 +15,15 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp.Web.Caching;
+using SixLabors.ImageSharp.Web.Commands;
+using SixLabors.ImageSharp.Web.Providers;
 using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp.Web.Processors;
+using SixLabors.ImageSharp.Web.Middleware;
 using NodaTime.Serialization.SystemTextJson;
 using Microsoft.Extensions.DependencyInjection;
+using SixLabors.ImageSharp.Web.DependencyInjection;
 
 namespace TradeSaber
 {
@@ -45,7 +52,6 @@ namespace TradeSaber
             services.AddSingleton<Random>();
             services.AddHttpContextAccessor();
             services.AddSingleton<HttpClient>();
-            services.AddSingleton<FileManager>();
             services.AddTransient<CardDispatcher>();
             services.AddSingleton<DiscordService>();
             services.AddSingleton<IClock>(SystemClock.Instance);
@@ -66,6 +72,27 @@ namespace TradeSaber
                 });
             });
 
+            services.AddImageSharp()
+            .SetRequestParser<QueryCollectionRequestParser>()
+            .Configure<PhysicalFileSystemCacheOptions>(options =>
+            {
+                options.CacheFolder = "image-cache";
+            })
+            .SetCache(provider =>
+            {
+                return new PhysicalFileSystemCache(
+                            provider.GetRequiredService<IOptions<PhysicalFileSystemCacheOptions>>(),
+                            provider.GetRequiredService<IWebHostEnvironment>(),
+                            provider.GetRequiredService<IOptions<ImageSharpMiddlewareOptions>>(),
+                            provider.GetRequiredService<FormatUtilities>());
+            })
+            .SetCacheHash<CacheHash>()
+            .AddProvider<PhysicalFileSystemProvider>()
+            .AddProcessor<ResizeWebProcessor>()
+            .AddProcessor<FormatWebProcessor>()
+            .AddProcessor<BackgroundColorWebProcessor>()
+            .AddProcessor<JpegQualityWebProcessor>();
+
             services.AddControllers().AddJsonOptions(c => c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Bcl));
             services.AddSwaggerGen(c =>
             {
@@ -81,6 +108,8 @@ namespace TradeSaber
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext, ILogger<Startup> logger)
         {
+            //var path = Path.Combine(env.ContentRootPath, "wwwroot");
+            //env.WebRootPath = path;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -91,14 +120,27 @@ namespace TradeSaber
             logger.LogInformation("Ensuring Database Connection...");
             tradeContext.Database.EnsureCreated();
             app.UseHttpsRedirection();
+
+            //Directory.CreateDirectory(path);
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(path),
+            //    RequestPath = "/wwwroot"
+            //});
+
+            app.UseDefaultFiles();
+            app.UseImageSharp();
+            app.UseStaticFiles();
+
             app.UseRouting();
+            //app.UseImageSharp();
             app.UseAuthorization();
 
             app.UseCors(x => x
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-            
+
             app.UseMiddleware<JWTValidator>();
 
             logger.LogInformation("Mapping Endpoints...");
