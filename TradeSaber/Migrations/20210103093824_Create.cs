@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
 using NodaTime;
 using TradeSaber.Models;
 using TradeSaber.Models.Discord;
-using System.Collections.Generic;
 using static TradeSaber.Models.Session;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TradeSaber.Migrations
 {

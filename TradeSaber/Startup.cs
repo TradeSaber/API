@@ -52,6 +52,7 @@ namespace TradeSaber
             services.AddSingleton<Random>();
             services.AddHttpContextAccessor();
             services.AddSingleton<HttpClient>();
+            services.AddSingleton<HTIService>();
             services.AddTransient<CardDispatcher>();
             services.AddSingleton<DiscordService>();
             services.AddSingleton<IClock>(SystemClock.Instance);
@@ -81,10 +82,10 @@ namespace TradeSaber
             .SetCache(provider =>
             {
                 return new PhysicalFileSystemCache(
-                            provider.GetRequiredService<IOptions<PhysicalFileSystemCacheOptions>>(),
-                            provider.GetRequiredService<IWebHostEnvironment>(),
-                            provider.GetRequiredService<IOptions<ImageSharpMiddlewareOptions>>(),
-                            provider.GetRequiredService<FormatUtilities>());
+                    provider.GetRequiredService<IOptions<PhysicalFileSystemCacheOptions>>(),
+                    provider.GetRequiredService<IWebHostEnvironment>(),
+                    provider.GetRequiredService<IOptions<ImageSharpMiddlewareOptions>>(),
+                    provider.GetRequiredService<FormatUtilities>());
             })
             .SetCacheHash<CacheHash>()
             .AddProvider<PhysicalFileSystemProvider>()
@@ -93,7 +94,10 @@ namespace TradeSaber
             .AddProcessor<BackgroundColorWebProcessor>()
             .AddProcessor<JpegQualityWebProcessor>();
 
-            services.AddControllers().AddJsonOptions(c => c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Bcl));
+            services.AddControllers().AddJsonOptions(c =>
+            {
+                c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Bcl);
+            });
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "TradeSaber", Version = "v1" });

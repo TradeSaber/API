@@ -1,11 +1,11 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Text;
 
 namespace TradeSaber
 {
@@ -51,15 +51,20 @@ namespace TradeSaber
 
         public static async Task<string> SaveImageToRoot(this IFormFile file, HashType type = HashType.SHA256)
         {
+            return await SaveImageToRoot(file.OpenReadStream(), type);
+        }
+
+        public static async Task<string> SaveImageToRoot(this Stream file, HashType type = HashType.SHA256)
+        {
             var endPath = Path.Combine("Images");
             var frontPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
-            var fileName = $"{ComputeHash(file.OpenReadStream(), type)}.png";
+            var fileName = $"{ComputeHash(file, type)}.png";
             var savePath = Path.Combine(frontPath, endPath);
             var fullPath = Path.Combine(savePath, fileName);
 
-            Directory.CreateDirectory(savePath);
-            using Stream stream = File.Create(fullPath);
-            await file.CopyToAsync(stream);
+            file.Position = 0;
+            using FileStream fs = new FileStream(fullPath, FileMode.Create, FileAccess.Write);
+            await file.CopyToAsync(fs);
 
             return Path.Combine(endPath, fileName);
         }

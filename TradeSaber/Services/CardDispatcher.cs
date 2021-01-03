@@ -167,7 +167,7 @@ namespace TradeSaber.Services
 
             // Part 2 - Get every single rarity probability
             IDictionary<Rarity, float> rarityTable = new Dictionary<Rarity, float>();
-            foreach (var rarity in rarities)
+            foreach (var rarity in uniqueRarities)
             {
                 rarityTable.Add(rarity, ProbabilityForRarity(rarity));
             }

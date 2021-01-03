@@ -15,7 +15,7 @@ using static TradeSaber.Models.Session;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    [Migration("20201214144527_Create")]
+    [Migration("20210103093824_Create")]
     partial class Create
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,7 +24,7 @@ namespace TradeSaber.Migrations
             modelBuilder
                 .UseIdentityByDefaultColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
-                .HasAnnotation("ProductVersion", "5.0.0");
+                .HasAnnotation("ProductVersion", "5.0.1");
 
             modelBuilder.Entity("CardUser", b =>
                 {

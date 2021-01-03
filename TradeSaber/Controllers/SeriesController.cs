@@ -22,20 +22,6 @@ namespace TradeSaber.Controllers
             _tradeContext = tradeContext;
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status413PayloadTooLarge)]
-        public async Task<ActionResult<Series>> GetSeries(Guid id)
-        {
-            Series? series = await _tradeContext.Series.FindAsync(id);
-            if (series == null)
-            {
-                return NotFound();
-            }
-            return series;
-        }
-
         [HttpPost]
         [Tauth(Role.Admin)]
         [RequestSizeLimit(15000000)]
@@ -57,7 +43,7 @@ namespace TradeSaber.Controllers
                 string error = "Series name already exists";
                 return BadRequest(new { error });
             }
-            Guid id = Guid.NewGuid();
+
             _logger.LogInformation("Processing Cover Image");
             string? path = await upload.Cover.SaveImageToRoot();
             if (path == null)
@@ -65,19 +51,21 @@ namespace TradeSaber.Controllers
                 string error = "Error occurred when uploading cover image.";
                 return BadRequest(new { error });
             }
+
             Series series = new Series
             {
-                ID = id,
                 Name = upload.Name,
+                ID = Guid.NewGuid(),
                 SubColor = upload.SubColor,
                 MainColor = upload.MainColor,
                 Description = upload.Description,
                 CoverURL = $"/{path.Replace("\\", "/").ToLower()}",
             };
+
             _logger.LogDebug("Adding new series {Name} to the database.", series.Name);
             _tradeContext.Series.Add(series);
             await _tradeContext.SaveChangesAsync();
-            return Ok(series);
+            return Ok(new { series.ID });
         }
 
         [Tauth(Role.Admin)]
