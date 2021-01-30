@@ -28,8 +28,6 @@ namespace TradeSaber
         {
             return builder.AddJwtBearer(options =>
             {
-                options.Authority = issuer;
-                options.Audience = audience;
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidIssuer = issuer,

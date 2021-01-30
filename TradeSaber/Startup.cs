@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using TradeSaber.Authorization;
 using TradeSaber.Services;
@@ -27,8 +29,17 @@ namespace TradeSaber
             services.Configure<DiscordSettings>(_configuration.GetSection(nameof(DiscordSettings)));
             services.Configure<JWTSettings>(_configuration.GetSection(nameof(JWTSettings)));
 
-            services.AddSingleton<IAuthService, DiscordAuthService>();
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<DiscordSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
+
+            services.AddTransient<IAuthService, DiscordAuthService>();
             services.AddSingleton<DiscordService>();
+
+            services.AddDbContext<TradeContext>(options =>
+            {
+                options.UseNpgsql(_configuration.GetConnectionString("Default"));
+                options.UseSnakeCaseNamingConvention();
+            });
 
             services.AddHttpClient();
             services.AddControllers();

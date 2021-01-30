@@ -6,6 +6,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using TradeSaber.Authorization;
 using TradeSaber.Models;
 using TradeSaber.Settings;
@@ -16,16 +17,18 @@ namespace TradeSaber.Services
     {
         private readonly ILogger _logger;
         private readonly JWTSettings _jwtSettings;
+        private readonly TradeContext _tradeContext;
 
-        public DiscordAuthService(ILogger<DiscordAuthService> logger, JWTSettings jwtSettings)
+        public DiscordAuthService(ILogger<DiscordAuthService> logger, JWTSettings jwtSettings, TradeContext tradeContext)
         {
             _logger = logger;
             _jwtSettings = jwtSettings;
+            _tradeContext = tradeContext;
         }
 
-        public User? GetUser(Guid? id)
+        public async Task<User?> GetUser(Guid? id)
         {
-            return new User { ID = id ?? default };
+            return await _tradeContext.Users.FindAsync(id);
         }
 
         public string Sign(Guid id, float lengthInHours = 1344, params string[] scopes)
@@ -34,7 +37,8 @@ namespace TradeSaber.Services
             SymmetricSecurityKey securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Key));
             SigningCredentials credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             List<Claim> claims = new List<Claim> { new Claim("sub", id.ToString()) };
-            claims.Add(new Claim("scope", scopes.Aggregate((a, b) => a + " " + b)));
+            if (scopes.Length != 0)
+                claims.Add(new Claim("scope", scopes.Aggregate((a, b) => a + " " + b)));
             JwtSecurityToken token = new JwtSecurityToken(
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
