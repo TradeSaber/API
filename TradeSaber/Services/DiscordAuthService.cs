@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Collections.Generic;
@@ -28,7 +29,7 @@ namespace TradeSaber.Services
 
         public async Task<User?> GetUser(Guid? id)
         {
-            return await _tradeContext.Users.FindAsync(id);
+            return await _tradeContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.ID == id);
         }
 
         public string Sign(Guid id, float lengthInHours = 1344, params string[] scopes)

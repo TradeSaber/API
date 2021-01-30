@@ -1,6 +1,6 @@
 ﻿using System;
-using TradeSaber.Models.Discord;
 using System.ComponentModel.DataAnnotations.Schema;
+using TradeSaber.Models.Discord;
 
 namespace TradeSaber.Models
 {
@@ -10,5 +10,7 @@ namespace TradeSaber.Models
 
         [Column(TypeName = "jsonb")]
         public DiscordUser Profile { get; set; } = null!;
+
+        public Role? Role { get; set; }
     }
 }

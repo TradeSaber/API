@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TradeSaber.Authorization;
 using TradeSaber.Models;
@@ -58,7 +60,7 @@ namespace TradeSaber.Controllers
             if (profile is null)
                 return NotFound(Error.Create("Could not fetch user profile from Discord."));
 
-            User? user = await _tradeContext.Users.FirstOrDefaultAsync(u => u.Profile.Id == profile.Id);
+            User? user = await _tradeContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Profile.Id == profile.Id);
             // User is not in our database?
             if (user is null)
             {
@@ -67,18 +69,39 @@ namespace TradeSaber.Controllers
                     ID = Guid.NewGuid(),
                     Profile = profile
                 };
+
+                if (_discordSettings.Roots.Contains(user.Profile.Id))
+                {
+                    Role? role = await _tradeContext.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
+                    if (role is null)
+                    {
+                        role = new Role
+                        {
+                            Name = "Admin",
+                            ID = Guid.NewGuid(),
+                            Scopes = new List<string>
+                            {
+                                Scopes.UploadFile
+                            }
+                        };
+                        _logger.LogInformation("Generating Admin Role");
+                        _tradeContext.Roles.Add(role);
+                    }
+                    user.Role = role;
+                }
+
                 _logger.LogInformation("Creating a new user. {Username}#{Discriminator}", user.Profile.Username, user.Profile.Discriminator);
                 await _tradeContext.Users.AddAsync(user);
             }
             else user.Profile = profile;
             await _tradeContext.SaveChangesAsync();
 
-            string token = _authService.Sign(user.ID);
+            string token = _authService.Sign(user.ID, scopes: user.Role?.Scopes.ToArray() ?? Array.Empty<string>());
             return Ok(new TokenContainer { Token = token });
         }
 
-        [Authorize]
         [HttpGet("@me")]
+        [Authorize(Scopes.UploadFile)]
         public async Task<ActionResult<User>> GetSelf()
         {
             // Although GetUser can return null, if they made it this far into the request it shouldn't return null unless they were manually deleted off the database and their key remained.
