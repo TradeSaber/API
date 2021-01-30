@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System;
 using TradeSaber.Authorization;
+using TradeSaber.Services;
+using TradeSaber.Settings;
 
 namespace TradeSaber
 {
@@ -22,21 +24,26 @@ namespace TradeSaber
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<DiscordSettings>(_configuration.GetSection(nameof(DiscordSettings)));
+            services.Configure<JWTSettings>(_configuration.GetSection(nameof(JWTSettings)));
+
+            services.AddSingleton<IAuthService, DiscordAuthService>();
+            services.AddSingleton<DiscordService>();
+
             services.AddHttpClient();
             services.AddControllers();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                .AddJwtBearerConfiguration(_configuration["JWT:Issuer"], _configuration["JWT:Audience"], _configuration["JWT:Key"]);
+                .AddJwtBearerConfiguration(_configuration["JWTSettings:Issuer"], _configuration["JWTSettings:Audience"], _configuration["JWTSettings:Key"]);
             services.AddAuthorization(options =>
             {
                 var scopes = new[]
                 {
                     Scopes.UploadFile
                 };
-
                 Array.ForEach(scopes, scope =>
                     options.AddPolicy(scope,
-                        policy => policy.Requirements.Add(new ScopeRequirement(_configuration["JWT:Isssuer"], scope))));
+                        policy => policy.Requirements.Add(new ScopeRequirement(_configuration["JWTSettings:Issuer"], scope))));
             });
 
             services.AddSingleton<IAuthorizationHandler, RequireScopeHandler>();

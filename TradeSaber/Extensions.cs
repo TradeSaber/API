@@ -32,6 +32,12 @@ namespace TradeSaber
                 options.Audience = audience;
                 options.TokenValidationParameters = new TokenValidationParameters()
                 {
+                    ValidIssuer = issuer,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidAudience = audience,
+                    ValidateIssuerSigningKey = true,
                     ClockSkew = new TimeSpan(0, 0, 30),
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 };
