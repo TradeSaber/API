@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -26,6 +27,17 @@ namespace TradeSaber
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                app.UseExceptionHandler(error =>
+                {
+                    error.Run(async context =>
+                    {
+                        context.Response.StatusCode = 500;
+                        await context.Response.WriteAsync("A server error has occured!");
+                    });
+                });
+            }
 
             app.UseHttpsRedirection();
             app.UseRouting();
@@ -34,6 +46,9 @@ namespace TradeSaber
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapFallback(async context => await context.Response.WriteAsync("Not Found"));
+                endpoints.Map("/", async context => await context.Response.WriteAsync("TradeSaber OK"));
+                endpoints.Map("/api", async context => await context.Response.WriteAsync("TradeSaber API OK"));
             });
         }
     }
