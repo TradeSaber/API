@@ -9,7 +9,7 @@ namespace TradeSaber
 {
     public class Startup
     {
-        private IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
         public Startup(IConfiguration configuration)
         {
@@ -18,6 +18,7 @@ namespace TradeSaber
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpClient();
             services.AddControllers();
         }
 
