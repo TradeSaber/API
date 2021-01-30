@@ -103,7 +103,7 @@ namespace TradeSaber
                 }
                 return builder.ToString().ToLower();
             }
-            return "empty";
+            throw new Exception("Hashing method not supported.");
         }
 
         public enum HashType

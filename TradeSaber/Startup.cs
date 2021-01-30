@@ -2,12 +2,14 @@ using System;
 using NodaTime;
 using System.IO;
 using System.Net.Http;
+using System.Text.Json;
 using System.Reflection;
 using TradeSaber.Settings;
 using TradeSaber.Services;
 using TradeSaber.Authorization;
 using Microsoft.OpenApi.Models;
 using SixLabors.ImageSharp.Web;
+using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -19,11 +21,13 @@ using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.Providers;
 using Microsoft.Extensions.Configuration;
+using MicroElements.Swashbuckle.NodaTime;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Middleware;
 using NodaTime.Serialization.SystemTextJson;
 using Microsoft.Extensions.DependencyInjection;
 using SixLabors.ImageSharp.Web.DependencyInjection;
+using System.Text.Json.Serialization;
 
 namespace TradeSaber
 {
@@ -94,9 +98,15 @@ namespace TradeSaber
             .AddProcessor<BackgroundColorWebProcessor>()
             .AddProcessor<JpegQualityWebProcessor>();
 
+            services.AddMvcCore().AddApiExplorer().AddJsonOptions(c =>
+            {
+                c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+                c.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+            });
             services.AddControllers().AddJsonOptions(c =>
             {
-                c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Bcl);
+                c.JsonSerializerOptions.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+                c.JsonSerializerOptions.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
             });
             services.AddSwaggerGen(c =>
             {
@@ -106,14 +116,17 @@ namespace TradeSaber
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
 
                 c.IncludeXmlComments(xmlPath);
+
+                JsonSerializerOptions json = new JsonSerializerOptions();
+                json.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+                json.Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+                c.ConfigureForNodaTimeWithSystemTextJson(json);
             });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext, ILogger<Startup> logger)
         {
-            //var path = Path.Combine(env.ContentRootPath, "wwwroot");
-            //env.WebRootPath = path;
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -125,19 +138,11 @@ namespace TradeSaber
             tradeContext.Database.EnsureCreated();
             app.UseHttpsRedirection();
 
-            //Directory.CreateDirectory(path);
-            //app.UseStaticFiles(new StaticFileOptions
-            //{
-            //    FileProvider = new PhysicalFileProvider(path),
-            //    RequestPath = "/wwwroot"
-            //});
-
             app.UseDefaultFiles();
             app.UseImageSharp();
             app.UseStaticFiles();
 
             app.UseRouting();
-            //app.UseImageSharp();
             app.UseAuthorization();
 
             app.UseCors(x => x
