@@ -8,8 +8,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using SixLabors.ImageSharp.Web.DependencyInjection;
+using SixLabors.ImageSharp.Web.Processors;
 using System;
+using System.IO;
 using TradeSaber.Authorization;
+using TradeSaber.Processors;
 using TradeSaber.Services;
 using TradeSaber.Settings;
 
@@ -43,6 +47,12 @@ namespace TradeSaber
 
             services.AddHttpClient();
             services.AddControllers();
+
+            services
+                .AddImageSharp()
+                .ClearProcessors()
+                .AddProcessor<FormatWebProcessor>()
+                .AddProcessor<SimpleReizeWebProcessor>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearerConfiguration(_configuration["JWTSettings:Issuer"], _configuration["JWTSettings:Audience"], _configuration["JWTSettings:Key"]);
@@ -79,6 +89,11 @@ namespace TradeSaber
             }
 
             app.UseHttpsRedirection();
+
+            app.UseDefaultFiles();
+            app.UseImageSharp();
+            app.UseStaticFiles();
+
             app.UseRouting();
 
             app.UseAuthentication();
