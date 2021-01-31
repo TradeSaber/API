@@ -9,9 +9,13 @@
 
   <ItemGroup>
     <Compile Remove="Media\**" />
+    <Compile Remove="wwwroot\**" />
     <Content Remove="Media\**" />
+    <Content Remove="wwwroot\**" />
     <EmbeddedResource Remove="Media\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
     <None Remove="Media\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
