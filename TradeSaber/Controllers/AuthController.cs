@@ -100,11 +100,12 @@ namespace TradeSaber.Controllers
             return Ok(new TokenContainer { Token = token });
         }
 
+        [Authorize]
         [HttpGet("@me")]
-        [Authorize(Scopes.UploadFile)]
         public async Task<ActionResult<User>> GetSelf()
         {
-            // Although GetUser can return null, if they made it this far into the request it shouldn't return null unless they were manually deleted off the database and their key remained.
+            // Although GetUser can return null, if they made it this far into the request it shouldn't
+            // return null unless they were manually deleted off the database and their key remained.
             return Ok(await _authService.GetUser(User.GetID()));
         }
 
