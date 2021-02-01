@@ -8,6 +8,7 @@ namespace TradeSaber
         public DbSet<User> Users => Set<User>();
         public DbSet<Role> Roles => Set<Role>();
         public DbSet<Media> Media => Set<Media>();
+        public DbSet<Rarity> Rarities => Set<Rarity>();
 
         public TradeContext(DbContextOptions<TradeContext> options) : base (options) { }
 

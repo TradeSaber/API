@@ -81,7 +81,8 @@ namespace TradeSaber.Controllers
                             ID = Guid.NewGuid(),
                             Scopes = new List<string>
                             {
-                                Scopes.UploadFile
+                                Scopes.UploadFile,
+                                Scopes.CreateRarity
                             }
                         };
                         _logger.LogInformation("Generating Admin Role");

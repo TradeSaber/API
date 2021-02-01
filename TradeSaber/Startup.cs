@@ -60,7 +60,9 @@ namespace TradeSaber
             {
                 var scopes = new[]
                 {
-                    Scopes.UploadFile
+                    Scopes.UploadFile,
+                    Scopes.CreateRarity,
+                    Scopes.ManageRarity,
                 };
                 Array.ForEach(scopes, scope =>
                     options.AddPolicy(scope,
