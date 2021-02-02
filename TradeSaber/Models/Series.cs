@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace TradeSaber.Models
@@ -31,6 +32,8 @@ namespace TradeSaber.Models
         [JsonIgnore]
         public IList<Card> Cards { get; set; } = new List<Card>();
 
+        [JsonPropertyName("cards"), NotMapped]
+        public IEnumerable<Guid> CardsIDs => Cards?.Select(c => c.ID) ?? Array.Empty<Guid>();
 
         public class Reference
         {

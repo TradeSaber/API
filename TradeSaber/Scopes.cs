@@ -6,6 +6,10 @@
         public const string ManageCard = "manage:card";
         public const string DeleteCard = "delete:card";
 
+        public const string CreateSeries = "create:series";
+        public const string ManageSeries = "manage:series";
+        public const string DeleteSeries = "delete:series";
+
         public const string CreateRarity = "create:rarity";
         public const string ManageRarity = "manage:rarity";
         public const string DeleteRarity = "delete:rarity";
@@ -27,9 +31,17 @@
             ManageCard,
             DeleteCard,
 
+            CreateSeries,
+            ManageSeries,
+            DeleteSeries,
+
             CreateRarity,
             ManageRarity,
             DeleteRarity,
+
+            CreateMutation,
+            ManageMutation,
+            DeleteMutation,
 
             CreateRole,
             ManageRole,
