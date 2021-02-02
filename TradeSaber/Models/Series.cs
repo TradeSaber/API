@@ -11,7 +11,6 @@ namespace TradeSaber.Models
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
 
-
         [JsonIgnore]
         public Media Icon { get; set; } = null!;
 
@@ -30,6 +29,14 @@ namespace TradeSaber.Models
         public ColorTheme Theme { get; set; } = null!;
 
         [JsonIgnore]
-        public IList<Card> Cards { get; set; } = null!;
+        public IList<Card> Cards { get; set; } = new List<Card>();
+
+
+        public class Reference
+        {
+            public Guid ID { get; set; }
+            public Series Series { get; set; } = null!;
+            public float? Boost { get; set; }
+        }
     }
 }

@@ -10,7 +10,7 @@ namespace TradeSaber.Models
         public Guid ID { get; set; }
         public string Name { get; set; } = null!;
         public string Description { get; set; } = null!;
-
+        
 
         [JsonIgnore]
         public Media Cover { get; set; } = null!;
@@ -18,7 +18,7 @@ namespace TradeSaber.Models
         [NotMapped]
         public string CoverURL => Cover.Path;
     
-        
+        public float? Value { get; set; }
         public int CardCount { get; set; }
         public ColorTheme Theme { get; set; } = null!;
 
@@ -27,9 +27,9 @@ namespace TradeSaber.Models
         public IList<Card.Reference> CardPool { get; set; } = new List<Card.Reference>();
         
         [JsonIgnore]
-        public IList<Rarity> Rarities { get; set; } = new List<Rarity>();
-        
-        [JsonIgnore]
         public IList<Card> Cards { get; set; } = new List<Card>();
+
+        [JsonIgnore]
+        public IList<Rarity>? Rarities { get; set; }
     }
 }
