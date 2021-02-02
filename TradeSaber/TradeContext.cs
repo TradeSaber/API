@@ -12,6 +12,7 @@ namespace TradeSaber
         public DbSet<Media> Media => Set<Media>();
         public DbSet<Series> Series => Set<Series>();
         public DbSet<Rarity> Rarities => Set<Rarity>();
+        public DbSet<Mutation> Mutations => Set<Mutation>();
         public DbSet<Inventory> Inventories => Set<Inventory>();
 
         public TradeContext(DbContextOptions<TradeContext> options) : base (options) { }
@@ -19,6 +20,12 @@ namespace TradeSaber
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.LogTo((string _) => { });
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Card.Reference>().ToTable("card_references");
+            modelBuilder.Entity<Series.Reference>().ToTable("series_references");
         }
     }
 }

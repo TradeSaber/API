@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TradeSaber;
@@ -12,9 +13,10 @@ using TradeSaber.Models.Discord;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    partial class TradeContextModelSnapshot : ModelSnapshot
+    [Migration("20210202212854_Mutations")]
+    partial class Mutations
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

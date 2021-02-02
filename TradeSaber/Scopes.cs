@@ -10,6 +10,10 @@
         public const string ManageRarity = "manage:rarity";
         public const string DeleteRarity = "delete:rarity";
 
+        public const string CreateMutation = "create:mutation";
+        public const string ManageMutation = "manage:mutation";
+        public const string DeleteMutation = "delete:mutation";
+
         public const string CreateRole = "create:role";
         public const string ManageRole = "manage:role";
 

@@ -35,8 +35,13 @@ namespace TradeSaber.Models
         public class Reference
         {
             public Guid ID { get; set; }
-            public Series Series { get; set; } = null!;
             public float? Boost { get; set; }
+
+            [JsonIgnore]
+            public Series Series { get; set; } = null!;
+
+            [JsonPropertyName("series"), NotMapped]
+            public Guid SeriesID => Series.ID;
         }
     }
 }

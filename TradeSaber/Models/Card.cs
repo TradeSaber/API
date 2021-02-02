@@ -46,8 +46,13 @@ namespace TradeSaber.Models
         {
             public Guid ID { get; set; }
             public bool Guaranteed { get; set; }
-            public Card Card { get; set; } = null!;
             public float? Boost { get; set; } = null;
+
+            [JsonIgnore]
+            public Card Card { get; set; } = null!;
+
+            [JsonPropertyName("card"), NotMapped]
+            public Guid CardID => Card.ID;
         }
     }
 }

@@ -63,12 +63,16 @@ namespace TradeSaber.Controllers
             // User is not in our database?
             if (user is null)
             {
+                var id = Guid.NewGuid();
                 user = new User
                 {
-                    ID = Guid.NewGuid(),
-                    Profile = profile
+                    ID = id,
+                    Profile = profile,
+                    Inventory = new Inventory
+                    {
+                        ID = id
+                    }
                 };
-
                 if (_discordSettings.Roots.Contains(user.Profile.Id))
                 {
                     const string rootRole = "Root";
@@ -88,6 +92,7 @@ namespace TradeSaber.Controllers
                 }
 
                 _logger.LogInformation("Creating a new user. {Username}#{Discriminator}", user.Profile.Username, user.Profile.Discriminator);
+                await _tradeContext.Inventories.AddAsync(user.Inventory);
                 await _tradeContext.Users.AddAsync(user);
             }
             else user.Profile = profile;
