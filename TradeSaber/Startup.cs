@@ -37,7 +37,9 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
 
             services.AddTransient<IAuthService, DiscordAuthService>();
+            services.AddTransient<CardDispatcher>();
             services.AddSingleton<DiscordService>();
+            services.AddSingleton<Random>();
 
             services.AddDbContext<TradeContext>(options =>
             {

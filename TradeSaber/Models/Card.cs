@@ -45,6 +45,7 @@ namespace TradeSaber.Models
         public class Reference
         {
             public Guid ID { get; set; }
+            public bool Guaranteed { get; set; }
             public Card Card { get; set; } = null!;
             public float? Boost { get; set; } = null;
         }

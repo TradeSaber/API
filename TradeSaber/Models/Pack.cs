@@ -20,8 +20,10 @@ namespace TradeSaber.Models
     
         public float? Value { get; set; }
         public int CardCount { get; set; }
-        public ColorTheme Theme { get; set; } = null!;
 
+
+        [Column(TypeName = "jsonb")]
+        public ColorTheme Theme { get; set; } = null!;
 
         [JsonIgnore]
         public IList<Card.Reference> CardPool { get; set; } = new List<Card.Reference>();
