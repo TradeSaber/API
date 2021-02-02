@@ -58,13 +58,7 @@ namespace TradeSaber
                 .AddJwtBearerConfiguration(_configuration["JWTSettings:Issuer"], _configuration["JWTSettings:Audience"], _configuration["JWTSettings:Key"]);
             services.AddAuthorization(options =>
             {
-                var scopes = new[]
-                {
-                    Scopes.UploadFile,
-                    Scopes.CreateRarity,
-                    Scopes.ManageRarity,
-                };
-                Array.ForEach(scopes, scope =>
+                Array.ForEach(Scopes.AllScopes, scope =>
                     options.AddPolicy(scope,
                         policy => policy.Requirements.Add(new ScopeRequirement(_configuration["JWTSettings:Issuer"], scope))));
             });

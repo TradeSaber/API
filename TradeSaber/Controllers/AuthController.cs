@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TradeSaber.Authorization;
@@ -72,20 +71,17 @@ namespace TradeSaber.Controllers
 
                 if (_discordSettings.Roots.Contains(user.Profile.Id))
                 {
-                    Role? role = await _tradeContext.Roles.FirstOrDefaultAsync(r => r.Name == "Admin");
+                    const string rootRole = "Root";
+                    Role? role = await _tradeContext.Roles.FirstOrDefaultAsync(r => r.Name == rootRole);
                     if (role is null)
                     {
                         role = new Role
                         {
-                            Name = "Admin",
+                            Name = rootRole,
                             ID = Guid.NewGuid(),
-                            Scopes = new List<string>
-                            {
-                                Scopes.UploadFile,
-                                Scopes.CreateRarity
-                            }
+                            Scopes = Scopes.AllScopes.ToList()
                         };
-                        _logger.LogInformation("Generating Admin Role");
+                        _logger.LogInformation($"Generating {rootRole} Role");
                         _tradeContext.Roles.Add(role);
                     }
                     user.Role = role;

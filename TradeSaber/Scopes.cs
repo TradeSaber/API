@@ -10,6 +10,28 @@
         public const string ManageRarity = "manage:rarity";
         public const string DeleteRarity = "delete:rarity";
 
+        public const string CreateRole = "create:role";
+        public const string ManageRole = "manage:role";
+
         public const string UploadFile = "upload:file";
+        public const string ManageUser = "manage:user";
+
+
+        public static readonly string[] AllScopes = new string[]
+        {
+            CreateCard,
+            ManageCard,
+            DeleteCard,
+
+            CreateRarity,
+            ManageRarity,
+            DeleteRarity,
+
+            CreateRole,
+            ManageRole,
+
+            UploadFile,
+            ManageUser,
+        };
     }
 }
