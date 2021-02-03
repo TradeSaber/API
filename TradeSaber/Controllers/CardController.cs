@@ -92,6 +92,35 @@ namespace TradeSaber.Controllers
             return Ok(card);
         }
 
+        [HttpPatch]
+        [Authorize(Scopes.ManageCard)]
+        public async Task<ActionResult<Card>> ModifyCard([FromBody] ModifyCardBody body)
+        {
+            Card? card = await _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Series).Include(c => c.Base).Include(c => c.Cover).FirstOrDefaultAsync(c => c.ID == body.ID);
+            if (card is null)
+            {
+                return NotFound(Error.Create("Can't modify nonexistant card."));
+            }
+            if (body.Public is not null)
+            {
+                card.Public = body.Public.Value;
+            }
+            if (body.Maximum is not null)
+            {
+                card.Maximum = body.Maximum.Value < 0 ? null : body.Maximum.Value;
+            }
+            if (body.Value is not null)
+            {
+                card.Value = body.Value.Value < 0 ? null : body.Value.Value;
+            }
+            if (body.Probability is not null)
+            {
+                card.Probability = body.Probability.Value;
+            }
+            await _tradeContext.SaveChangesAsync();
+            return Ok(card);
+        }
+
         public class CreateCardBody
         {
             public string Name { get; set; } = null!;
@@ -105,7 +134,15 @@ namespace TradeSaber.Controllers
             public int? Maximum { get; set; }
             public float? Value { get; set; }
             public float? Probability { get; set; }
+        }
 
+        public class ModifyCardBody
+        {
+            public Guid ID { get; set; }
+            public bool? Public { get; set; }
+            public int? Maximum { get; set; }
+            public float? Value { get; set; }
+            public float? Probability { get; set; }
         }
     }
 }
