@@ -13,7 +13,12 @@ namespace TradeSaber.Models
 
 
         public Rarity Rarity { get; set; } = null!;
+
+        [JsonIgnore]
         public Series Series { get; set; } = null!;
+
+        [JsonPropertyName("series"), NotMapped]
+        public Guid SeriesNM => Series?.ID ?? default;
 
 
         public bool Public { get; set; }

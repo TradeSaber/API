@@ -31,14 +31,18 @@ namespace TradeSaber
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<DiscordSettings>(_configuration.GetSection(nameof(DiscordSettings)));
+            services.Configure<HTISettings>(_configuration.GetSection(nameof(HTISettings)));
             services.Configure<JWTSettings>(_configuration.GetSection(nameof(JWTSettings)));
 
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<DiscordSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
 
             services.AddTransient<IAuthService, DiscordAuthService>();
             services.AddTransient<CardDispatcher>();
             services.AddSingleton<DiscordService>();
+            services.AddTransient<HTIService>();
+            services.AddSingleton<HTILoader>();
             services.AddSingleton<Random>();
 
             services.AddDbContext<TradeContext>(options =>
