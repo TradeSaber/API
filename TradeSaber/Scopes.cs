@@ -2,6 +2,10 @@
 {
     public static class Scopes
     {
+        public const string CreatePack = "create:pack";
+        public const string ManagePack = "manage:pack";
+        public const string DeletePack = "delete:pack";
+
         public const string CreateCard = "create:card";
         public const string ManageCard = "manage:card";
         public const string DeleteCard = "delete:card";
@@ -27,6 +31,10 @@
 
         public static readonly string[] AllScopes = new string[]
         {
+            CreatePack,
+            ManagePack,
+            DeletePack,
+
             CreateCard,
             ManageCard,
             DeleteCard,

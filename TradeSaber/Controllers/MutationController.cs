@@ -142,7 +142,6 @@ namespace TradeSaber.Controllers
                 mutation.Cards.Add(new Card.Reference
                 {
                     Card = card,
-                    ID = Guid.NewGuid(),
                     Boost = activeReference.Boost,
                     Guaranteed = activeReference.Guaranteed ?? false,
                 });
@@ -158,7 +157,6 @@ namespace TradeSaber.Controllers
                 mutation.Series.Add(new Series.Reference
                 {
                     Series = seri,
-                    ID = Guid.NewGuid(),
                     Boost = activeReference.Boost,
                 });
             }

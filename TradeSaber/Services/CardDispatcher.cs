@@ -80,7 +80,7 @@ namespace TradeSaber.Services
         {
             List<Card> set = new List<Card>();
             set.AddRange(pack.CardPool.Where(c => c.Guaranteed).Select(c => c.Card).AsEnumerable());
-            pack.Rarities?.ToList().ForEach(rar => set.Add(Roll(rar)));
+            pack.Rarities.ToList().ForEach(rar => set.Add(Roll(rar.Rarity)));
 
             var cards = _tradeContext.Cards.Where(card => card.Public).ToList();
             cards.AddRange(pack.CardPool.Select(p => p.Card));

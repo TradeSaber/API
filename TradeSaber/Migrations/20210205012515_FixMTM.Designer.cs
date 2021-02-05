@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TradeSaber;
@@ -12,15 +13,35 @@ using TradeSaber.Models.Discord;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    partial class TradeContextModelSnapshot : ModelSnapshot
+    [Migration("20210205012515_FixMTM")]
+    partial class FixMTM
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .UseIdentityByDefaultColumns()
                 .HasAnnotation("Relational:MaxIdentifierLength", 63)
                 .HasAnnotation("ProductVersion", "5.0.2");
+
+            modelBuilder.Entity("CardInventory", b =>
+                {
+                    b.Property<Guid>("CardsID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("cards_id");
+
+                    b.Property<Guid>("OwnedByID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("owned_by_id");
+
+                    b.HasKey("CardsID", "OwnedByID")
+                        .HasName("pk_card_inventory");
+
+                    b.HasIndex("OwnedByID")
+                        .HasDatabaseName("ix_card_inventory_owned_by_id");
+
+                    b.ToTable("card_inventory");
+                });
 
             modelBuilder.Entity("CardPack", b =>
                 {
@@ -39,6 +60,44 @@ namespace TradeSaber.Migrations
                         .HasDatabaseName("ix_card_pack_packs_id");
 
                     b.ToTable("card_pack");
+                });
+
+            modelBuilder.Entity("InventoryPack", b =>
+                {
+                    b.Property<Guid>("InInventoriesID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("in_inventories_id");
+
+                    b.Property<Guid>("PacksID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("packs_id");
+
+                    b.HasKey("InInventoriesID", "PacksID")
+                        .HasName("pk_inventory_pack");
+
+                    b.HasIndex("PacksID")
+                        .HasDatabaseName("ix_inventory_pack_packs_id");
+
+                    b.ToTable("inventory_pack");
+                });
+
+            modelBuilder.Entity("PackRarity", b =>
+                {
+                    b.Property<Guid>("PacksID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("packs_id");
+
+                    b.Property<Guid>("RaritiesID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("rarities_id");
+
+                    b.HasKey("PacksID", "RaritiesID")
+                        .HasName("pk_pack_rarity");
+
+                    b.HasIndex("RaritiesID")
+                        .HasDatabaseName("ix_pack_rarity_rarities_id");
+
+                    b.ToTable("pack_rarity");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Card", b =>
@@ -127,10 +186,6 @@ namespace TradeSaber.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("guaranteed");
 
-                    b.Property<Guid?>("InventoryID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("inventory_id");
-
                     b.Property<Guid?>("MutationID")
                         .HasColumnType("uuid")
                         .HasColumnName("mutation_id");
@@ -144,9 +199,6 @@ namespace TradeSaber.Migrations
 
                     b.HasIndex("CardID1")
                         .HasDatabaseName("ix_card_references_card_id1");
-
-                    b.HasIndex("InventoryID")
-                        .HasDatabaseName("ix_card_references_inventory_id");
 
                     b.HasIndex("MutationID")
                         .HasDatabaseName("ix_card_references_mutation_id");
@@ -164,19 +216,12 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("CardID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("card_id");
-
                     b.Property<float>("TirCoin")
                         .HasColumnType("real")
                         .HasColumnName("tir_coin");
 
                     b.HasKey("ID")
                         .HasName("pk_inventories");
-
-                    b.HasIndex("CardID")
-                        .HasDatabaseName("ix_inventories_card_id");
 
                     b.ToTable("inventories");
                 });
@@ -293,40 +338,6 @@ namespace TradeSaber.Migrations
                     b.ToTable("packs");
                 });
 
-            modelBuilder.Entity("TradeSaber.Models.Pack+Reference", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("InventoryID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("inventory_id");
-
-                    b.Property<Guid?>("PackID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("pack_id");
-
-                    b.Property<Guid?>("RarityID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("rarity_id");
-
-                    b.HasKey("ID")
-                        .HasName("pk_pack_references");
-
-                    b.HasIndex("InventoryID")
-                        .HasDatabaseName("ix_pack_references_inventory_id");
-
-                    b.HasIndex("PackID")
-                        .HasDatabaseName("ix_pack_references_pack_id");
-
-                    b.HasIndex("RarityID")
-                        .HasDatabaseName("ix_pack_references_rarity_id");
-
-                    b.ToTable("pack_references");
-                });
-
             modelBuilder.Entity("TradeSaber.Models.Rarity", b =>
                 {
                     b.Property<Guid>("ID")
@@ -352,33 +363,6 @@ namespace TradeSaber.Migrations
                         .HasName("pk_rarities");
 
                     b.ToTable("rarities");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Rarity+Reference", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("PackID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("pack_id");
-
-                    b.Property<Guid?>("RarityID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("rarity_id");
-
-                    b.HasKey("ID")
-                        .HasName("pk_rarity_references");
-
-                    b.HasIndex("PackID")
-                        .HasDatabaseName("ix_rarity_references_pack_id");
-
-                    b.HasIndex("RarityID")
-                        .HasDatabaseName("ix_rarity_references_rarity_id");
-
-                    b.ToTable("rarity_references");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Role", b =>
@@ -509,6 +493,23 @@ namespace TradeSaber.Migrations
                     b.ToTable("users");
                 });
 
+            modelBuilder.Entity("CardInventory", b =>
+                {
+                    b.HasOne("TradeSaber.Models.Card", null)
+                        .WithMany()
+                        .HasForeignKey("CardsID")
+                        .HasConstraintName("fk_card_inventory_cards_cards_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradeSaber.Models.Inventory", null)
+                        .WithMany()
+                        .HasForeignKey("OwnedByID")
+                        .HasConstraintName("fk_card_inventory_inventories_owned_by_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("CardPack", b =>
                 {
                     b.HasOne("TradeSaber.Models.Card", null)
@@ -522,6 +523,40 @@ namespace TradeSaber.Migrations
                         .WithMany()
                         .HasForeignKey("PacksID")
                         .HasConstraintName("fk_card_pack_packs_packs_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("InventoryPack", b =>
+                {
+                    b.HasOne("TradeSaber.Models.Inventory", null)
+                        .WithMany()
+                        .HasForeignKey("InInventoriesID")
+                        .HasConstraintName("fk_inventory_pack_inventories_in_inventories_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradeSaber.Models.Pack", null)
+                        .WithMany()
+                        .HasForeignKey("PacksID")
+                        .HasConstraintName("fk_inventory_pack_packs_packs_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("PackRarity", b =>
+                {
+                    b.HasOne("TradeSaber.Models.Pack", null)
+                        .WithMany()
+                        .HasForeignKey("PacksID")
+                        .HasConstraintName("fk_pack_rarity_packs_packs_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TradeSaber.Models.Rarity", null)
+                        .WithMany()
+                        .HasForeignKey("RaritiesID")
+                        .HasConstraintName("fk_pack_rarity_rarities_rarities_id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -566,11 +601,6 @@ namespace TradeSaber.Migrations
                         .HasForeignKey("CardID1")
                         .HasConstraintName("fk_card_references_cards_card_id1");
 
-                    b.HasOne("TradeSaber.Models.Inventory", null)
-                        .WithMany("Cards")
-                        .HasForeignKey("InventoryID")
-                        .HasConstraintName("fk_card_references_inventories_inventory_id");
-
                     b.HasOne("TradeSaber.Models.Mutation", null)
                         .WithMany("Cards")
                         .HasForeignKey("MutationID")
@@ -582,14 +612,6 @@ namespace TradeSaber.Migrations
                         .HasConstraintName("fk_card_references_packs_pack_id");
 
                     b.Navigation("Card");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Inventory", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Card", null)
-                        .WithMany("OwnedBy")
-                        .HasForeignKey("CardID")
-                        .HasConstraintName("fk_inventories_cards_card_id");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Media", b =>
@@ -610,41 +632,6 @@ namespace TradeSaber.Migrations
                         .HasConstraintName("fk_packs_media_cover_id");
 
                     b.Navigation("Cover");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Pack+Reference", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Inventory", null)
-                        .WithMany("Packs")
-                        .HasForeignKey("InventoryID")
-                        .HasConstraintName("fk_pack_references_inventories_inventory_id");
-
-                    b.HasOne("TradeSaber.Models.Pack", "Pack")
-                        .WithMany()
-                        .HasForeignKey("PackID")
-                        .HasConstraintName("fk_pack_references_packs_pack_id");
-
-                    b.HasOne("TradeSaber.Models.Rarity", null)
-                        .WithMany("Packs")
-                        .HasForeignKey("RarityID")
-                        .HasConstraintName("fk_pack_references_rarities_rarity_id");
-
-                    b.Navigation("Pack");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Rarity+Reference", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Pack", null)
-                        .WithMany("Rarities")
-                        .HasForeignKey("PackID")
-                        .HasConstraintName("fk_rarity_references_packs_pack_id");
-
-                    b.HasOne("TradeSaber.Models.Rarity", "Rarity")
-                        .WithMany()
-                        .HasForeignKey("RarityID")
-                        .HasConstraintName("fk_rarity_references_rarities_rarity_id");
-
-                    b.Navigation("Rarity");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Series", b =>
@@ -696,18 +683,6 @@ namespace TradeSaber.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("TradeSaber.Models.Card", b =>
-                {
-                    b.Navigation("OwnedBy");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Inventory", b =>
-                {
-                    b.Navigation("Cards");
-
-                    b.Navigation("Packs");
-                });
-
             modelBuilder.Entity("TradeSaber.Models.Mutation", b =>
                 {
                     b.Navigation("Cards");
@@ -718,13 +693,6 @@ namespace TradeSaber.Migrations
             modelBuilder.Entity("TradeSaber.Models.Pack", b =>
                 {
                     b.Navigation("CardPool");
-
-                    b.Navigation("Rarities");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Rarity", b =>
-                {
-                    b.Navigation("Packs");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Series", b =>

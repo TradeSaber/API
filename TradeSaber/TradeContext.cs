@@ -25,7 +25,9 @@ namespace TradeSaber
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Card.Reference>().ToTable("card_references");
+            modelBuilder.Entity<Pack.Reference>().ToTable("pack_references");
             modelBuilder.Entity<Series.Reference>().ToTable("series_references");
+            modelBuilder.Entity<Rarity.Reference>().ToTable("rarity_references");
         }
     }
 }
