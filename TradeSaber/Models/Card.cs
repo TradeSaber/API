@@ -44,9 +44,6 @@ namespace TradeSaber.Models
         [JsonIgnore]
         public IList<Pack> Packs { get; set; } = new List<Pack>();
 
-        [JsonIgnore]
-        public IList<Inventory> OwnedBy { get; set; } = new List<Inventory>();
-
         public class Reference
         {
             public Guid ID { get; set; }
