@@ -22,6 +22,10 @@
         public const string ManageMutation = "manage:mutation";
         public const string DeleteMutation = "delete:mutation";
 
+        public const string CreateObjective = "create:objective";
+        public const string ManageObjective = "manage:objective";
+        public const string DeleteObjective = "delete:objective";
+
         public const string CreateRole = "create:role";
         public const string ManageRole = "manage:role";
 
@@ -50,6 +54,10 @@
             CreateMutation,
             ManageMutation,
             DeleteMutation,
+
+            CreateObjective,
+            ManageObjective,
+            DeleteObjective,
 
             CreateRole,
             ManageRole,

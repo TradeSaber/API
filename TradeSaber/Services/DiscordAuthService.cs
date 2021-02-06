@@ -29,7 +29,7 @@ namespace TradeSaber.Services
 
         public async Task<User?> GetUser(Guid? id)
         {
-            return await _tradeContext.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.ID == id);
+            return await _tradeContext.Users.Include(u => u.Role).Include(u => u.Inventory).Include(u => u.CompletedObjectives).FirstOrDefaultAsync(u => u.ID == id);
         }
 
         public string Sign(Guid id, float lengthInHours = 1344, params string[] scopes)

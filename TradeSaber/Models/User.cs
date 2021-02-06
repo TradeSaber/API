@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 using TradeSaber.Models.Discord;
@@ -14,7 +15,13 @@ namespace TradeSaber.Models
 
         public Role? Role { get; set; }
 
+        public float XP { get; set; }
+
         [JsonIgnore]
         public Inventory Inventory { get; set; } = null!;
+
+
+        [JsonIgnore]
+        public IList<Objective.Result> CompletedObjectives { get; set; } = new List<Objective.Result>();
     }
 }

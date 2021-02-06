@@ -38,11 +38,12 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<HTISettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
 
-            services.AddTransient<IAuthService, DiscordAuthService>();
-            services.AddTransient<CardDispatcher>();
+            services.AddScoped<IAuthService, DiscordAuthService>();
             services.AddSingleton<DiscordService>();
-            services.AddTransient<HTIService>();
+            services.AddScoped<CardDispatcher>();
+            services.AddScoped<RewardService>();
             services.AddSingleton<HTILoader>();
+            services.AddScoped<HTIService>();
             services.AddSingleton<Random>();
 
             services.AddDbContext<TradeContext>(options =>

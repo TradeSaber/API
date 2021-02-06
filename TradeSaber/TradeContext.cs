@@ -13,6 +13,7 @@ namespace TradeSaber
         public DbSet<Series> Series => Set<Series>();
         public DbSet<Rarity> Rarities => Set<Rarity>();
         public DbSet<Mutation> Mutations => Set<Mutation>();
+        public DbSet<Objective> Objectives => Set<Objective>();
         public DbSet<Inventory> Inventories => Set<Inventory>();
 
         public TradeContext(DbContextOptions<TradeContext> options) : base (options) { }
@@ -28,6 +29,7 @@ namespace TradeSaber
             modelBuilder.Entity<Pack.Reference>().ToTable("pack_references");
             modelBuilder.Entity<Series.Reference>().ToTable("series_references");
             modelBuilder.Entity<Rarity.Reference>().ToTable("rarity_references");
+            modelBuilder.Entity<Objective.Result>().ToTable("objective_results");
         }
     }
 }
