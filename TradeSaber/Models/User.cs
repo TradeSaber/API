@@ -20,6 +20,8 @@ namespace TradeSaber.Models
         [JsonIgnore]
         public Inventory Inventory { get; set; } = null!;
 
+        [Column(TypeName = "jsonb")]
+        public Settings Settings { get; set; } = new Settings();
 
         [JsonIgnore]
         public IList<Objective.Result> CompletedObjectives { get; set; } = new List<Objective.Result>();

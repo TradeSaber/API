@@ -111,9 +111,33 @@ namespace TradeSaber.Controllers
             return Ok(await _authService.GetUser(User.GetID()));
         }
 
+        [Authorize]
+        [HttpPost("@me")]
+        public async Task<ActionResult<User>> EditSelf([FromBody] EditUserBody body)
+        {
+            User user = (await _authService.GetUser(User.GetID()))!;
+
+            if (body.AcceptTrades is not null)
+            {
+                user.Settings.AcceptTrades = body.AcceptTrades.Value;
+            }
+            if (body.Privacy is not null)
+            {
+                user.Settings.Privacy = body.Privacy.Value;
+            }
+            await _tradeContext.SaveChangesAsync();
+            return Ok(user);
+        }
+
         public class TokenContainer
         {
             public string Token { get; set; } = null!;
+        }
+
+        public class EditUserBody
+        {
+            public bool? AcceptTrades { get; set; }
+            public Models.Settings.InventoryPrivacy? Privacy { get; set; }
         }
     }
 }

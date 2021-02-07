@@ -38,6 +38,14 @@ namespace TradeSaber.Controllers
             {
                 return NotFound(Error.Create("User does not exist."));
             }
+            if (!user.Settings.AcceptTrades)
+            {
+                return Unauthorized(Error.Create("User is not accepting trades."));
+            }
+            if (user.Settings.Privacy != Models.Settings.InventoryPrivacy.Public)
+            {
+                return Unauthorized(Error.Create("User's inventory is private."));
+            }
             return Ok(user.Inventory);
         }
     }
