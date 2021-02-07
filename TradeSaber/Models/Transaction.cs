@@ -13,10 +13,10 @@ namespace TradeSaber.Models
         public float? RequestedTir { get; set; }
         public User Sender { get; set; } = null!;
         public User Receiver { get; set; } = null!;
-        public IList<Pack.TradeableReference> Packs { get; set; } = new List<Pack.TradeableReference>();
         public IList<Card.TradeableReference> Cards { get; set; } = new List<Card.TradeableReference>();
-        public IList<Pack.TradeableRReference> RequestedPacks { get; set; } = new List<Pack.TradeableRReference>();
+        public IList<Pack.TradeableReference> Packs { get; set; } = new List<Pack.TradeableReference>();
         public IList<Card.TradeableRReference> RequestedCards { get; set; } = new List<Card.TradeableRReference>();
+        public IList<Pack.TradeableRReference> RequestedPacks { get; set; } = new List<Pack.TradeableRReference>();
 
         public enum Status
         {

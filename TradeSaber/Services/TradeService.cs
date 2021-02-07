@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -139,6 +140,17 @@ namespace TradeSaber.Services
                     }
                 }
             }
+            var senderTransactions = await _tradeContext.Transactions.Where(t => t.Sender.ID == transaction.Sender.ID).ToListAsync();
+            var receiverTransactions = await _tradeContext.Transactions.Where(t => t.Receiver.ID == transaction.Receiver.ID).ToListAsync();
+            foreach (var trade in senderTransactions)
+            {
+                await CheckTransactionValidity(trade, false, false);
+            }
+            foreach (var trade in receiverTransactions)
+            {
+                await CheckTransactionValidity(trade, false, false);
+            }
+            await _tradeContext.SaveChangesAsync();
             return true;
         }
 
