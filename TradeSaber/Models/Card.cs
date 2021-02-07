@@ -56,5 +56,27 @@ namespace TradeSaber.Models
             [JsonPropertyName("card"), NotMapped]
             public Guid CardID => Card.ID;
         }
+
+        public class TradeableReference
+        {
+            public Guid ID { get; set; }
+
+            [JsonIgnore]
+            public Card Card { get; set; } = null!;
+
+            [JsonPropertyName("card"), NotMapped]
+            public Guid CardID => Card.ID;
+        }
+
+        public class TradeableRReference
+        {
+            public Guid ID { get; set; }
+
+            [JsonIgnore]
+            public Card Card { get; set; } = null!;
+
+            [JsonPropertyName("card"), NotMapped]
+            public Guid CardID => Card.ID;
+        }
     }
 }

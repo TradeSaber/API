@@ -47,5 +47,27 @@ namespace TradeSaber.Models
             [JsonPropertyName("pack")]
             public Guid PackID => Pack.ID;
         }
+
+        public class TradeableReference
+        {
+            public Guid ID { get; set; }
+
+            [JsonIgnore]
+            public Pack Pack { get; set; } = null!;
+
+            [JsonPropertyName("pack")]
+            public Guid PackID => Pack.ID;
+        }
+
+        public class TradeableRReference
+        {
+            public Guid ID { get; set; }
+
+            [JsonIgnore]
+            public Pack Pack { get; set; } = null!;
+
+            [JsonPropertyName("pack")]
+            public Guid PackID => Pack.ID;
+        }
     }
 }

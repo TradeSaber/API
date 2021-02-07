@@ -9,5 +9,10 @@ namespace TradeSaber.Models.Discord
         {
             get => "https://cdn.discordapp.com/avatars/" + Id + "/" + Avatar + (Avatar.Substring(0, 2) == "a_" ? ".gif" : ".png");
         }
+
+        public string FormattedName()
+        {
+            return $"{Username}#{Discriminator}";
+        }
     }
 }

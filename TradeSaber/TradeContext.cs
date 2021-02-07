@@ -15,7 +15,8 @@ namespace TradeSaber
         public DbSet<Mutation> Mutations => Set<Mutation>();
         public DbSet<Objective> Objectives => Set<Objective>();
         public DbSet<Inventory> Inventories => Set<Inventory>();
-
+        public DbSet<Transaction> Transactions => Set<Transaction>();
+        
         public TradeContext(DbContextOptions<TradeContext> options) : base (options) { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -30,6 +31,10 @@ namespace TradeSaber
             modelBuilder.Entity<Series.Reference>().ToTable("series_references");
             modelBuilder.Entity<Rarity.Reference>().ToTable("rarity_references");
             modelBuilder.Entity<Objective.Result>().ToTable("objective_results");
+            modelBuilder.Entity<Card.TradeableReference>().ToTable("tradeable_cards");
+            modelBuilder.Entity<Pack.TradeableReference>().ToTable("tradeable_packs");
+            modelBuilder.Entity<Card.TradeableRReference>().ToTable("tradeable_r_cards");
+            modelBuilder.Entity<Pack.TradeableRReference>().ToTable("tradeable_r_packs");
         }
     }
 }

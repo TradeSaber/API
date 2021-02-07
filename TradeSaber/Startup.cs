@@ -43,6 +43,7 @@ namespace TradeSaber
             services.AddScoped<CardDispatcher>();
             services.AddScoped<RewardService>();
             services.AddSingleton<HTILoader>();
+            services.AddScoped<TradeService>();
             services.AddScoped<HTIService>();
             services.AddSingleton<Random>();
 

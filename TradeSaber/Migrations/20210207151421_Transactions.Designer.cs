@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TradeSaber;
@@ -12,9 +13,10 @@ using TradeSaber.Models.Discord;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    partial class TradeContextModelSnapshot : ModelSnapshot
+    [Migration("20210207151421_Transactions")]
+    partial class Transactions
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -157,33 +159,6 @@ namespace TradeSaber.Migrations
                     b.ToTable("card_references");
                 });
 
-            modelBuilder.Entity("TradeSaber.Models.Card+TradeableRReference", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("CardID1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("card_id1");
-
-                    b.Property<Guid?>("TransactionID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("transaction_id");
-
-                    b.HasKey("ID")
-                        .HasName("pk_tradeable_r_cards");
-
-                    b.HasIndex("CardID1")
-                        .HasDatabaseName("ix_tradeable_r_cards_card_id1");
-
-                    b.HasIndex("TransactionID")
-                        .HasDatabaseName("ix_tradeable_r_cards_transaction_id");
-
-                    b.ToTable("tradeable_r_cards");
-                });
-
             modelBuilder.Entity("TradeSaber.Models.Card+TradeableReference", b =>
                 {
                     b.Property<Guid>("ID")
@@ -200,15 +175,15 @@ namespace TradeSaber.Migrations
                         .HasColumnName("transaction_id");
 
                     b.HasKey("ID")
-                        .HasName("pk_tradeable_cards");
+                        .HasName("pk_tradable_cards");
 
                     b.HasIndex("CardID1")
-                        .HasDatabaseName("ix_tradeable_cards_card_id1");
+                        .HasDatabaseName("ix_tradable_cards_card_id1");
 
                     b.HasIndex("TransactionID")
-                        .HasDatabaseName("ix_tradeable_cards_transaction_id");
+                        .HasDatabaseName("ix_tradable_cards_transaction_id");
 
-                    b.ToTable("tradeable_cards");
+                    b.ToTable("tradable_cards");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Inventory", b =>
@@ -443,6 +418,10 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("rarity_id");
 
+                    b.Property<Guid?>("TransactionID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("transaction_id");
+
                     b.HasKey("ID")
                         .HasName("pk_pack_references");
 
@@ -458,61 +437,10 @@ namespace TradeSaber.Migrations
                     b.HasIndex("RarityID")
                         .HasDatabaseName("ix_pack_references_rarity_id");
 
+                    b.HasIndex("TransactionID")
+                        .HasDatabaseName("ix_pack_references_transaction_id");
+
                     b.ToTable("pack_references");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Pack+TradeableRReference", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("PackID1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("pack_id1");
-
-                    b.Property<Guid?>("TransactionID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("transaction_id");
-
-                    b.HasKey("ID")
-                        .HasName("pk_tradeable_r_packs");
-
-                    b.HasIndex("PackID1")
-                        .HasDatabaseName("ix_tradeable_r_packs_pack_id1");
-
-                    b.HasIndex("TransactionID")
-                        .HasDatabaseName("ix_tradeable_r_packs_transaction_id");
-
-                    b.ToTable("tradeable_r_packs");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Pack+TradeableReference", b =>
-                {
-                    b.Property<Guid>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<Guid?>("PackID1")
-                        .HasColumnType("uuid")
-                        .HasColumnName("pack_id1");
-
-                    b.Property<Guid?>("TransactionID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("transaction_id");
-
-                    b.HasKey("ID")
-                        .HasName("pk_tradeable_packs");
-
-                    b.HasIndex("PackID1")
-                        .HasDatabaseName("ix_tradeable_packs_pack_id1");
-
-                    b.HasIndex("TransactionID")
-                        .HasDatabaseName("ix_tradeable_packs_transaction_id");
-
-                    b.ToTable("tradeable_packs");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.Rarity", b =>
@@ -672,14 +600,6 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<Guid?>("ReceiverID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("receiver_id");
-
-                    b.Property<float?>("RequestedTir")
-                        .HasColumnType("real")
-                        .HasColumnName("requested_tir");
-
                     b.Property<Guid?>("SenderID")
                         .HasColumnType("uuid")
                         .HasColumnName("sender_id");
@@ -702,9 +622,6 @@ namespace TradeSaber.Migrations
 
                     b.HasKey("ID")
                         .HasName("pk_transactions");
-
-                    b.HasIndex("ReceiverID")
-                        .HasDatabaseName("ix_transactions_receiver_id");
 
                     b.HasIndex("SenderID")
                         .HasDatabaseName("ix_transactions_sender_id");
@@ -823,32 +740,17 @@ namespace TradeSaber.Migrations
                     b.Navigation("Card");
                 });
 
-            modelBuilder.Entity("TradeSaber.Models.Card+TradeableRReference", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Card", "Card")
-                        .WithMany()
-                        .HasForeignKey("CardID1")
-                        .HasConstraintName("fk_tradeable_r_cards_cards_card_id1");
-
-                    b.HasOne("TradeSaber.Models.Transaction", null)
-                        .WithMany("RequestedCards")
-                        .HasForeignKey("TransactionID")
-                        .HasConstraintName("fk_tradeable_r_cards_transactions_transaction_id");
-
-                    b.Navigation("Card");
-                });
-
             modelBuilder.Entity("TradeSaber.Models.Card+TradeableReference", b =>
                 {
                     b.HasOne("TradeSaber.Models.Card", "Card")
                         .WithMany()
                         .HasForeignKey("CardID1")
-                        .HasConstraintName("fk_tradeable_cards_cards_card_id1");
+                        .HasConstraintName("fk_tradable_cards_cards_card_id1");
 
                     b.HasOne("TradeSaber.Models.Transaction", null)
                         .WithMany("Cards")
                         .HasForeignKey("TransactionID")
-                        .HasConstraintName("fk_tradeable_cards_transactions_transaction_id");
+                        .HasConstraintName("fk_tradable_cards_transactions_transaction_id");
 
                     b.Navigation("Card");
                 });
@@ -922,35 +824,10 @@ namespace TradeSaber.Migrations
                         .HasForeignKey("RarityID")
                         .HasConstraintName("fk_pack_references_rarities_rarity_id");
 
-                    b.Navigation("Pack");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Pack+TradeableRReference", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Pack", "Pack")
-                        .WithMany()
-                        .HasForeignKey("PackID1")
-                        .HasConstraintName("fk_tradeable_r_packs_packs_pack_id1");
-
-                    b.HasOne("TradeSaber.Models.Transaction", null)
-                        .WithMany("RequestedPacks")
-                        .HasForeignKey("TransactionID")
-                        .HasConstraintName("fk_tradeable_r_packs_transactions_transaction_id");
-
-                    b.Navigation("Pack");
-                });
-
-            modelBuilder.Entity("TradeSaber.Models.Pack+TradeableReference", b =>
-                {
-                    b.HasOne("TradeSaber.Models.Pack", "Pack")
-                        .WithMany()
-                        .HasForeignKey("PackID1")
-                        .HasConstraintName("fk_tradeable_packs_packs_pack_id1");
-
                     b.HasOne("TradeSaber.Models.Transaction", null)
                         .WithMany("Packs")
                         .HasForeignKey("TransactionID")
-                        .HasConstraintName("fk_tradeable_packs_transactions_transaction_id");
+                        .HasConstraintName("fk_pack_references_transactions_transaction_id");
 
                     b.Navigation("Pack");
                 });
@@ -1004,17 +881,10 @@ namespace TradeSaber.Migrations
 
             modelBuilder.Entity("TradeSaber.Models.Transaction", b =>
                 {
-                    b.HasOne("TradeSaber.Models.User", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverID")
-                        .HasConstraintName("fk_transactions_users_receiver_id");
-
                     b.HasOne("TradeSaber.Models.User", "Sender")
                         .WithMany()
                         .HasForeignKey("SenderID")
                         .HasConstraintName("fk_transactions_users_sender_id");
-
-                    b.Navigation("Receiver");
 
                     b.Navigation("Sender");
                 });
@@ -1079,10 +949,6 @@ namespace TradeSaber.Migrations
                     b.Navigation("Cards");
 
                     b.Navigation("Packs");
-
-                    b.Navigation("RequestedCards");
-
-                    b.Navigation("RequestedPacks");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.User", b =>
