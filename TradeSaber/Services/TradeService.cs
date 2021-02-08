@@ -150,6 +150,8 @@ namespace TradeSaber.Services
             {
                 await CheckTransactionValidity(trade, false, false);
             }
+            _tradeContext.Users.Update(transaction.Sender);
+            _tradeContext.Users.Update(transaction.Receiver);
             await _tradeContext.SaveChangesAsync();
             return true;
         }

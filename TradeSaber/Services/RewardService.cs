@@ -22,12 +22,14 @@ namespace TradeSaber.Services
         {
             _logger.LogInformation("Adding {amount} XP to {Username}.", amount, user.Profile.Username);
             user.XP += (await XPBoostValue()) * amount;
+            _tradeContext.Users.Update(user);
         }
 
         public async Task AddTir(User user, float amount)
         {
             _logger.LogInformation("Adding T{amount} to {Username}.", amount, user.Profile.Username);
             user.Inventory.TirCoin += (await TirBoostValue()) * amount;
+            _tradeContext.Users.Update(user);
         }
 
         private async Task<float> XPBoostValue()
