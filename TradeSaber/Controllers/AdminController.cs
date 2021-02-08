@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TradeSaber.Authorization;
 using TradeSaber.Models;
+using TradeSaber.Services;
 
 namespace TradeSaber.Controllers
 {
@@ -16,12 +18,16 @@ namespace TradeSaber.Controllers
     public class AdminController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly IAuthService _authService;
         private readonly TradeContext _tradeContext;
+        private readonly RewardService _rewardService;
 
-        public AdminController(ILogger<AdminController> logger, TradeContext tradeContext)
+        public AdminController(ILogger<AdminController> logger, IAuthService authService, TradeContext tradeContext, RewardService rewardService)
         {
             _logger = logger;
+            _authService = authService;
             _tradeContext = tradeContext;
+            _rewardService = rewardService;
         }
 
         [HttpGet("scopes")]
@@ -119,6 +125,48 @@ namespace TradeSaber.Controllers
             return Ok(user);
         }
 
+        [HttpPost("give")]
+        [Authorize(Scopes.ManageUser)]
+        public async Task<ActionResult> GiveUserStuff([FromBody] GiveBody body)
+        {
+            User? user = await _authService.GetUser(body.UserID);
+            if (user is null)
+            {
+                return NotFound(Error.Create("User does not exist."));
+            }
+            if (body.XP is not null)
+            {
+                await _rewardService.AddXP(user, body.XP.Value);
+            }
+            if (body.Tir is not null)
+            {
+                await _rewardService.AddTir(user, body.Tir.Value);
+            }
+            if (body.Cards is not null)
+            {
+                foreach (var cardID in body.Cards)
+                {
+                    Card? card = await _tradeContext.Cards.Include(c => c.Cover).Include(c => c.Base).FirstOrDefaultAsync(c => c.ID == cardID);
+                    if (card is not null)
+                    {
+                        user.Inventory.Cards.Add(new Card.TradeableReference { Card = card });
+                    }
+                }
+            }
+            if (body.Packs is not null)
+            {
+                foreach (var packID in body.Packs)
+                {
+                    Pack? pack = await _tradeContext.Packs.Include(p => p.Cover).FirstOrDefaultAsync(p => p.ID == packID);
+                    if (pack is not null)
+                    {
+                        user.Inventory.Packs.Add(new Pack.Reference { Pack = pack });
+                    }
+                }
+            }
+            return NoContent();
+        }
+
         public class CreateRoleBody
         {
             public string Name { get; set; } = null!;
@@ -136,6 +184,15 @@ namespace TradeSaber.Controllers
         {
             public Guid ID { get; set; }
             public string? Role { get; set; }
+        }
+
+        public class GiveBody
+        {
+            public Guid UserID { get; set; }
+            public float? XP { get; set; }
+            public float? Tir { get; set; }
+            public Guid[]? Cards { get; set; }
+            public Guid[]? Packs { get; set; }
         }
     }
 }

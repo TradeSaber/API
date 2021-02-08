@@ -127,10 +127,6 @@ namespace TradeSaber.Migrations
                         .HasColumnType("boolean")
                         .HasColumnName("guaranteed");
 
-                    b.Property<Guid?>("InventoryID")
-                        .HasColumnType("uuid")
-                        .HasColumnName("inventory_id");
-
                     b.Property<Guid?>("MutationID")
                         .HasColumnType("uuid")
                         .HasColumnName("mutation_id");
@@ -144,9 +140,6 @@ namespace TradeSaber.Migrations
 
                     b.HasIndex("CardID1")
                         .HasDatabaseName("ix_card_references_card_id1");
-
-                    b.HasIndex("InventoryID")
-                        .HasDatabaseName("ix_card_references_inventory_id");
 
                     b.HasIndex("MutationID")
                         .HasDatabaseName("ix_card_references_mutation_id");
@@ -195,6 +188,10 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("card_id1");
 
+                    b.Property<Guid?>("InventoryID")
+                        .HasColumnType("uuid")
+                        .HasColumnName("inventory_id");
+
                     b.Property<Guid?>("TransactionID")
                         .HasColumnType("uuid")
                         .HasColumnName("transaction_id");
@@ -204,6 +201,9 @@ namespace TradeSaber.Migrations
 
                     b.HasIndex("CardID1")
                         .HasDatabaseName("ix_tradeable_cards_card_id1");
+
+                    b.HasIndex("InventoryID")
+                        .HasDatabaseName("ix_tradeable_cards_inventory_id");
 
                     b.HasIndex("TransactionID")
                         .HasDatabaseName("ix_tradeable_cards_transaction_id");
@@ -732,7 +732,7 @@ namespace TradeSaber.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("role_id");
 
-                    b.Property<Settings>("Settings")
+                    b.Property<Models.Settings>("Settings")
                         .IsRequired()
                         .HasColumnType("jsonb")
                         .HasColumnName("settings");
@@ -810,11 +810,6 @@ namespace TradeSaber.Migrations
                         .HasForeignKey("CardID1")
                         .HasConstraintName("fk_card_references_cards_card_id1");
 
-                    b.HasOne("TradeSaber.Models.Inventory", null)
-                        .WithMany("Cards")
-                        .HasForeignKey("InventoryID")
-                        .HasConstraintName("fk_card_references_inventories_inventory_id");
-
                     b.HasOne("TradeSaber.Models.Mutation", null)
                         .WithMany("Cards")
                         .HasForeignKey("MutationID")
@@ -849,6 +844,11 @@ namespace TradeSaber.Migrations
                         .WithMany()
                         .HasForeignKey("CardID1")
                         .HasConstraintName("fk_tradeable_cards_cards_card_id1");
+
+                    b.HasOne("TradeSaber.Models.Inventory", null)
+                        .WithMany("Cards")
+                        .HasForeignKey("InventoryID")
+                        .HasConstraintName("fk_tradeable_cards_inventories_inventory_id");
 
                     b.HasOne("TradeSaber.Models.Transaction", null)
                         .WithMany("Cards")

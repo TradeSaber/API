@@ -10,8 +10,8 @@ namespace TradeSaber.Models
     {
         public Guid ID { get; set; }
         public float TirCoin { get; set; }
-        public IList<Card.Reference> Cards { get; set; } = new List<Card.Reference>();
         public IList<Pack.Reference> Packs { get; set; } = new List<Pack.Reference>();
+        public IList<Card.TradeableReference> Cards { get; set; } = new List<Card.TradeableReference>();
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotMapped]
         public float? PortfolioValue => Cards?.Sum(c => c.Card.Value.GetValueOrDefault());
