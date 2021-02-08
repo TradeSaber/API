@@ -116,7 +116,6 @@ namespace TradeSaber.Controllers
         public async Task<ActionResult<User>> EditSelf([FromBody] EditUserBody body)
         {
             User user = (await _authService.GetUser(User.GetID()))!;
-
             if (body.AcceptTrades is not null)
             {
                 user.Settings.AcceptTrades = body.AcceptTrades.Value;
@@ -125,6 +124,7 @@ namespace TradeSaber.Controllers
             {
                 user.Settings.Privacy = body.Privacy.Value;
             }
+            _tradeContext.Users.Update(user);
             await _tradeContext.SaveChangesAsync();
             return Ok(user);
         }

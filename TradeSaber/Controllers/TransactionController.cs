@@ -137,6 +137,10 @@ namespace TradeSaber.Controllers
             {
                 return BadRequest(Error.Create("You cannot trade with yourself."));
             }
+            if (!receiver.Settings.AcceptTrades)
+            {
+                return Unauthorized(Error.Create("User is not accepting trades."));
+            }
             List<Card> myCards = new List<Card>();
             List<Pack> myPacks = new List<Pack>();
             List<Card> theirCards = new List<Card>();

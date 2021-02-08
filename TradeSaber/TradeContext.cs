@@ -1,4 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using TradeSaber.Models;
 
 namespace TradeSaber
@@ -35,6 +38,44 @@ namespace TradeSaber
             modelBuilder.Entity<Pack.TradeableReference>().ToTable("tradeable_packs");
             modelBuilder.Entity<Card.TradeableRReference>().ToTable("tradeable_r_cards");
             modelBuilder.Entity<Pack.TradeableRReference>().ToTable("tradeable_r_packs");
+        }
+
+        public async Task<IEnumerable<User>> AllUsers()
+        {
+            return await Users.Include(u => u.Inventory).ThenInclude(i => i.Cards).Include(u => u.Role).ToListAsync();
+        }
+
+        public async Task<IEnumerable<User>> AllUsersByTir()
+        {
+            var users = await AllUsers();
+            users = users.OrderByDescending(u => u.Inventory.TirCoin).ToList();
+            for (int i = 0; i < users.Count(); i++)
+            {
+                users.ElementAt(i).Inventory.Rank = i + 1;
+            }
+            return users;
+        }
+
+        public async Task<IEnumerable<User>> AllUsersByPortfolio()
+        {
+            var users = await AllUsers();
+            users = users.OrderByDescending(u => u.Inventory.PortfolioValue).ToList();
+            for (int i = 0; i < users.Count(); i++)
+            {
+                users.ElementAt(i).Inventory.Rank = i + 1;
+            }
+            return users;
+        }
+
+        public async Task<IEnumerable<User>> AllUsersByTotal()
+        {
+            var users = await AllUsers();
+            users = users.OrderByDescending(u => u.Inventory.TirCoin + u.Inventory.PortfolioValue).ToList();
+            for (int i = 0; i < users.Count(); i++)
+            {
+                users.ElementAt(i).Inventory.Rank = i + 1;
+            }
+            return users;
         }
     }
 }
