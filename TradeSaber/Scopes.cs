@@ -2,6 +2,8 @@
 {
     public static class Scopes
     {
+        public const string Mascot = "mascot:descriptor";
+
         public const string CreatePack = "create:pack";
         public const string ManagePack = "manage:pack";
         public const string DeletePack = "delete:pack";
@@ -35,6 +37,8 @@
 
         public static readonly string[] AllScopes = new string[]
         {
+            Mascot,
+
             CreatePack,
             ManagePack,
             DeletePack,

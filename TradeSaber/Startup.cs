@@ -39,14 +39,15 @@ namespace TradeSaber
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
 
             services.AddScoped<IAuthService, DiscordAuthService>();
+            services.AddScoped<ObjectiveIconService>();
             services.AddSingleton<DiscordService>();
             services.AddScoped<CardDispatcher>();
             services.AddScoped<RewardService>();
+            services.AddScoped<MascotService>();
             services.AddSingleton<HTILoader>();
             services.AddScoped<TradeService>();
             services.AddScoped<HTIService>();
             services.AddSingleton<Random>();
-
             services.AddDbContext<TradeContext>(options =>
             {
                 options.UseNpgsql(_configuration.GetConnectionString("Default"));

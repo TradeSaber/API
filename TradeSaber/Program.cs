@@ -8,6 +8,7 @@ using Serilog.Events;
 using Serilog.Extensions.Logging;
 using Serilog.Sinks.SystemConsole.Themes;
 using System.IO;
+using TradeSaber.Services;
 
 namespace TradeSaber
 {
@@ -59,6 +60,8 @@ namespace TradeSaber
                             factory.AddProvider(provider);
                         return factory;
                     });
+
+                    services.AddHostedService<ObjectiveWorker>();
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
