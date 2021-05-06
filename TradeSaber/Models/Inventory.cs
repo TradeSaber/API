@@ -15,7 +15,7 @@ namespace TradeSaber.Models
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotMapped]
         public float? PortfolioValue => Cards?.Sum(c => c.Card.Value.GetValueOrDefault());
-    
+
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull), NotMapped]
         public int? Rank { get; set; }
     }

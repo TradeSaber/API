@@ -30,6 +30,7 @@ namespace TradeSaber
 
         public void ConfigureServices(IServiceCollection services)
         {
+            var deploymentSettings = _configuration.GetSection(nameof(DeploymentSettings)).Get<DeploymentSettings>();
             services.Configure<DiscordSettings>(_configuration.GetSection(nameof(DiscordSettings)));
             services.Configure<HTISettings>(_configuration.GetSection(nameof(HTISettings)));
             services.Configure<JWTSettings>(_configuration.GetSection(nameof(JWTSettings)));
@@ -52,6 +53,16 @@ namespace TradeSaber
             {
                 options.UseNpgsql(_configuration.GetConnectionString("Default"));
                 options.UseSnakeCaseNamingConvention();
+            });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "_allowTSOrigins", opt =>
+                {
+                    opt.WithOrigins(deploymentSettings.CORS)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod();
+                });
             });
 
             services.AddHttpClient();
@@ -94,6 +105,7 @@ namespace TradeSaber
             }
 
             app.UseHttpsRedirection();
+            app.UseCors("_allowTSOrigins");
 
             app.UseDefaultFiles();
             app.UseImageSharp();

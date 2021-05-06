@@ -37,7 +37,7 @@ namespace TradeSaber.Models
 
         public class Reference
         {
-            public Guid ID { get; set; }
+            public Guid ID { get; set; } // does this need to be exposed?
             public float? Boost { get; set; }
 
             [JsonIgnore]
