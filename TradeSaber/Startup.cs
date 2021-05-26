@@ -86,8 +86,10 @@ namespace TradeSaber
             services.AddSingleton<IAuthorizationHandler, RequireScopeHandler>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext)
         {
+            tradeContext.Database.EnsureCreated();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

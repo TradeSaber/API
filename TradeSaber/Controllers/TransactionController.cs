@@ -141,10 +141,10 @@ namespace TradeSaber.Controllers
             {
                 return Unauthorized(Error.Create("User is not accepting trades."));
             }
-            List<Card> myCards = new List<Card>();
-            List<Pack> myPacks = new List<Pack>();
-            List<Card> theirCards = new List<Card>();
-            List<Pack> thierPacks = new List<Pack>();
+            List<Card> myCards = new();
+            List<Pack> myPacks = new();
+            List<Card> theirCards = new();
+            List<Pack> thierPacks = new();
             if (body.Cards is not null)
             {
                 foreach (var cardID in body.Cards)

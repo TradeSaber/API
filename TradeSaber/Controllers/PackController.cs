@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TradeSaber.Authorization;
 using TradeSaber.Models;
 
 namespace TradeSaber.Controllers
@@ -15,11 +16,13 @@ namespace TradeSaber.Controllers
     public class PackController : ControllerBase
     {
         private readonly ILogger _logger;
+        private readonly IAuthService _authService;
         private readonly TradeContext _tradeContext;
 
-        public PackController(ILogger<PackController> logger, TradeContext tradeContext)
+        public PackController(ILogger<PackController> logger, IAuthService authService, TradeContext tradeContext)
         {
             _logger = logger;
+            _authService = authService;
             _tradeContext = tradeContext;
         }
 
@@ -27,6 +30,47 @@ namespace TradeSaber.Controllers
         public IAsyncEnumerable<Pack> GetAllPacks()
         {
             return _tradeContext.Packs.Include(p => p.Cover).Include(c => c.Cards).Include(c => c.Rarities).ThenInclude(r => r.Rarity).Include(c => c.CardPool).ThenInclude(cp => cp.Card).AsAsyncEnumerable();
+        }
+
+        [HttpGet("in-inventory/@me")]
+        public async Task<ActionResult<IEnumerable<Pack>>> InSelfInventory()
+        {
+            User user = (await _authService.GetUser(User.GetID()))!;
+            List<Pack> packs = new();
+            foreach (var pack in user.Inventory.Packs)
+            {
+                packs.Add(await _tradeContext.Packs.Include(p => p.Cover).Include(c => c.Cards).Include(c => c.Rarities).ThenInclude(r => r.Rarity).Include(c => c.CardPool).ThenInclude(cp => cp.Card).FirstOrDefaultAsync(p => p.ID == pack.PackID));
+            }
+            return Ok(packs);
+        }
+
+        [HttpGet("in-inventory/{id}")]
+        public async Task<ActionResult<IEnumerable<Pack>>> InInventory(Guid id)
+        {
+            User? user = await _tradeContext.Users.Include(u => u.Inventory).FirstOrDefaultAsync(u => u.ID == id);
+            if (user is null)
+            {
+                return NotFound(Error.Create("User does not exist."));
+            }
+            if (user.Settings.Privacy != Models.Settings.InventoryPrivacy.Public)
+            {
+                return Unauthorized(Error.Create("User's inventory is private."));
+            }
+            List<Pack> packs = new();
+            foreach (var pack in user.Inventory.Packs)
+            {
+                packs.Add(await _tradeContext.Packs.Include(p => p.Cover).Include(c => c.Cards).Include(c => c.Rarities).ThenInclude(r => r.Rarity).Include(c => c.CardPool).ThenInclude(cp => cp.Card).FirstOrDefaultAsync(p => p.ID == pack.PackID));
+            }
+            return Ok(packs);
+        }
+
+        [HttpGet("contains/{id}")]
+        public async Task<IAsyncEnumerable<Pack>> GetPacksThatIncludeCard(Guid id)
+        {
+            Card? card = await _tradeContext.Cards.FindAsync(id);
+            if (card is null || card.Public)
+                return GetAllPacks();
+            return _tradeContext.Packs.Include(p => p.Cover).Include(c => c.Cards).Include(c => c.Rarities).ThenInclude(r => r.Rarity).Include(c => c.CardPool).ThenInclude(cp => cp.Card).Where(c => c.CardPool.Any(r => r.CardID == id)).AsAsyncEnumerable();
         }
 
         [HttpGet("{id}")]

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using TradeSaber.Authorization;
 using TradeSaber.Models;
@@ -32,6 +33,60 @@ namespace TradeSaber.Controllers
         public IAsyncEnumerable<Card> GetAllCards()
         {
             return _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Series).Include(c => c.Base).Include(c => c.Cover).AsAsyncEnumerable();
+        }
+
+        [HttpGet("in-inventory/@me")]
+        public async Task<ActionResult<IEnumerable<Card>>> InSelfInventory()
+        {
+            User user = (await _authService.GetUser(User.GetID()))!;
+            List<Card> cards = new();
+            foreach (var card in user.Inventory.Cards)
+            {
+                cards.Add(await _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Series).Include(c => c.Base).Include(c => c.Cover).FirstOrDefaultAsync(c => c.ID == card.CardID));
+            }
+            return Ok(cards);
+        }
+
+        [HttpGet("in-inventory/{id}")]
+        public async Task<ActionResult<IEnumerable<Card>>> InInventory(Guid id)
+        {
+            User? user = await _tradeContext.Users.Include(u => u.Inventory).FirstOrDefaultAsync(u => u.ID == id);
+            if (user is null)
+            {
+                return NotFound(Error.Create("User does not exist."));
+            }
+            if (user.Settings.Privacy != Models.Settings.InventoryPrivacy.Public)
+            {
+                return Unauthorized(Error.Create("User's inventory is private."));
+            }
+            List<Card> cards = new();
+            foreach (var card in user.Inventory.Cards)
+            {
+                cards.Add(await _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Series).Include(c => c.Base).Include(c => c.Cover).FirstOrDefaultAsync(c => c.ID == card.CardID));
+            }
+            return Ok(cards);
+        }
+
+        [HttpGet("exclusive-in-pack/{id}")]
+        public async Task<ActionResult<IEnumerable<Card>>> GetPossibleCardsInPack(Guid id)
+        {
+            Pack? pack = await _tradeContext.Packs.FindAsync(id);
+            if (pack is null)
+            {
+                return NotFound(Error.Create("Pack not found."));
+            }
+            List<Card> cards = new();
+            var query = _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Series).Include(c => c.Base).Include(c => c.Cover).Where(c => !c.Public).AsAsyncEnumerable();
+            await foreach (Card card in query)
+                if (pack.CardPool.Any(c => c.CardID == card.ID))
+                    cards.Add(card);
+            return Ok(cards);
+        }
+
+        [HttpGet("in-series/{id}")]
+        public IAsyncEnumerable<Card> GetCardsInSeries(Guid id)
+        {
+            return _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Series).Include(c => c.Base).Include(c => c.Cover).Where(c => c.Series.ID == id).AsAsyncEnumerable();
         }
 
         [HttpGet("{id}")]
