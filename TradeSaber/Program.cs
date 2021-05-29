@@ -45,7 +45,7 @@ namespace TradeSaber
                     {
                         if (!Path.IsPathRooted(path))
                             path = Path.Combine(host.HostingEnvironment.ContentRootPath, path);
-                        DirectoryInfo directory = new DirectoryInfo(path);
+                        DirectoryInfo directory = new(path);
                         directory.Create();
                         if (directory.Exists)
                             logger.WriteTo.File(Path.Combine(path, "log-.txt"), rollingInterval: RollingInterval.Day, outputTemplate: LOG_OUTPUT_FORMAT, rollOnFileSizeLimit: true);
@@ -55,7 +55,7 @@ namespace TradeSaber
                     services.AddSingleton<ILoggerFactory>(sp =>
                     {
                         LoggerProviderCollection collection = sp.GetRequiredService<LoggerProviderCollection>();
-                        SerilogLoggerFactory factory = new SerilogLoggerFactory(dispose: true, providerCollection: collection);
+                        SerilogLoggerFactory factory = new(dispose: true, providerCollection: collection);
                         foreach (var provider in sp.GetServices<ILoggerProvider>())
                             factory.AddProvider(provider);
                         return factory;
