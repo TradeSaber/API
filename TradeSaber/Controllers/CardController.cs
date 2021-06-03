@@ -20,13 +20,24 @@ namespace TradeSaber.Controllers
         private readonly HTIService _htiService;
         private readonly IAuthService _authService;
         private readonly TradeContext _tradeContext;
+        private readonly CardDispatcher _cardDispatcher;
 
-        public CardController(ILogger<CardController> logger, HTIService htiService, IAuthService authService, TradeContext tradeContext)
+        public CardController(ILogger<CardController> logger, HTIService htiService, IAuthService authService, TradeContext tradeContext, CardDispatcher cardDispatcher)
         {
             _logger = logger;
             _htiService = htiService;
             _authService = authService;
             _tradeContext = tradeContext;
+            _cardDispatcher = cardDispatcher;
+        }
+        
+        [HttpGet("random")]
+        public async Task<ActionResult<IEnumerable<Card>>> Random()
+        {
+            var list = new List<Card>();
+            for (int i = 0; i < 5; i++)
+                list.Add(await _cardDispatcher.Roll());
+            return list;
         }
 
         [HttpGet]
@@ -126,7 +137,7 @@ namespace TradeSaber.Controllers
             {
                 return BadRequest(Error.Create("Error occured while creating card face."));
             }
-            Card card = new Card
+            Card card = new()
             {
                 ID = Guid.NewGuid(),
                 Name = body.Name,

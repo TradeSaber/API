@@ -22,7 +22,7 @@ namespace TradeSaber.Processors
         {
             Size size = ParseSize(commands, parser, culture);
 
-            if ((size.Width <= 0 && size.Height <= 0) || (size.Width > 2048 && size.Height > 2048))
+            if (size.Width == 0 || size.Height == 0 || size.Width > 2048 || size.Height > 2048)
             {
                 return image;
             }

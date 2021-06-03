@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using TradeSaber.Models;
 
 namespace TradeSaber.Services
@@ -24,16 +25,17 @@ namespace TradeSaber.Services
         /// Rolls a completely random card from the natural card pool.
         /// </summary>
         /// <returns></returns>
-        public Card Roll(Rarity? rarity = null)
+        public async Task<Card> Roll(Rarity? rarity = null)
         {
             _logger.LogDebug("Rolling a random natural card");
-            var cards = _tradeContext.Cards.Include(c => c.Rarity).Where(card => card.Public);
+            var cards = _tradeContext.Cards.Include(c => c.Rarity).Include(c => c.Base).Include(c => c.Cover).Where(card => card.Public);
             if (rarity is not null)
             {
                 _logger.LogDebug("...with rarity {Rarity}.", rarity.Name);
                 cards = cards.Where(card => card.Rarity.ID == rarity.ID);
             }
-            return RollFromPool(cards, RepresentationValueConstant(cards));
+            List<Card> fetchedCards = await cards.ToListAsync();
+            return await RollFromPool(fetchedCards, RepresentationValueConstant(fetchedCards));
         }
 
         /// <summary>
@@ -47,10 +49,10 @@ namespace TradeSaber.Services
         /// The chance of this happening is so incredibly low, I'm not factoring in a fix for it.
         /// </remarks>
         /// <returns>The selected (probability-based) card.</returns>
-        public Card RollFromPool(IEnumerable<Card> cards, int pulsey, IEnumerable<Card.Reference>? references = null)
+        public async Task<Card> RollFromPool(IEnumerable<Card> cards, int pulsey, IEnumerable<Card.Reference>? references = null)
         {
             // Calculate the representations for every card based on their probability.
-            List<Card> lottery = new List<Card>();
+            List<Card> lottery = new();
             int maxCardCount = cards.Count();
             foreach (var card in cards)
             {
@@ -73,26 +75,27 @@ namespace TradeSaber.Services
                 _logger.LogDebug("Printing {Name} ({ID})", selected.Name, selected.ID);
                 return selected;
             }
-            return RollFromPool(cards, pulsey, references);
+            return await RollFromPool(cards, pulsey, references);
         }
 
-        public IEnumerable<Card> RollSet(Pack pack)
+        public async Task<IEnumerable<Card>> RollSet(Pack pack)
         {
-            List<Card> set = new List<Card>();
+            List<Card> set = new();
             set.AddRange(pack.CardPool.Where(c => c.Guaranteed).Select(c => c.Card).AsEnumerable());
-            pack.Rarities.ToList().ForEach(rar => set.Add(Roll(rar.Rarity)));
+            foreach (var packRarity in pack.Rarities)
+                set.Add(await Roll(packRarity.Rarity));
 
             var cards = _tradeContext.Cards.Where(card => card.Public).ToList();
             cards.AddRange(pack.CardPool.Select(p => p.Card));
             int pulsey = RepresentationValueConstant(cards);
             while (pack.CardCount > set.Count)
             {
-                set.Add(RollFromPool(cards, pulsey, pack.CardPool));
+                set.Add(await RollFromPool(cards, pulsey, pack.CardPool));
             }
             return set;
         }
 
-        public IEnumerable<Card> RollSet(IEnumerable<(uint, Rarity)>? rarities = null)
+        public async Task<IEnumerable<Card>> RollSet(IEnumerable<(uint, Rarity)>? rarities = null)
         {
             IList<Card> cards = new List<Card>();
             if (rarities is null)
@@ -101,7 +104,7 @@ namespace TradeSaber.Services
             {
                 for (int i = 0; i < rarity.Item1; i++)
                 {
-                    cards.Add(Roll(rarity.Item2));
+                    cards.Add(await Roll(rarity.Item2));
                 }
             }
             return cards;
