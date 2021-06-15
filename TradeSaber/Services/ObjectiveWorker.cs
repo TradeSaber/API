@@ -76,7 +76,7 @@ namespace TradeSaber.Services
                         int rangeIndex = _random.Next(0, data.ObjectiveRange.Length);
                         int range = data.ObjectiveRange[rangeIndex];
 
-                        var oldActiveObjectives = await tradeContext.Objectives.Where(o => o.Active).ToListAsync(cancellationToken: token);
+                        var oldActiveObjectives = await tradeContext.Objectives.Where(o => o.Active && !o.Special).ToListAsync(cancellationToken: token);
                         foreach (var objective in oldActiveObjectives)
                         {
                             objective.Active = false;
@@ -98,7 +98,7 @@ namespace TradeSaber.Services
                                     int levelIndex = _random.Next(0, data.Levels.Length);
                                     Objective.Data.Level level = data.Levels[levelIndex];
                                     
-                                    StringBuilder builder = new StringBuilder("Play and beat {name} by {author}");
+                                    StringBuilder builder = new("Play and beat {name} by {author}");
                                     subject = $"hash:{level.Hash}|";
                                     if (level.Key is not null)
                                         subject += $"key:{level.Key}|";
@@ -169,7 +169,7 @@ namespace TradeSaber.Services
                             }
 
                             Media icon = await objectiveIconService.Get(type);
-                            Objective objective = new Objective
+                            Objective objective = new()
                             {
                                 Active = true,
                                 ID = Guid.NewGuid(),
@@ -202,7 +202,8 @@ namespace TradeSaber.Services
 
         private static Objective.Type[] ActiveTypes()
         {
-            return new Objective.Type[] {
+            return new Objective.Type[]
+            {
                 Objective.Type.PlayLevel,
                 Objective.Type.PlayXLevels,
                 Objective.Type.UseModifier,

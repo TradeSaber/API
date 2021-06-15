@@ -80,9 +80,10 @@ namespace TradeSaber.Controllers
                 return NotFound(Error.Create("Could not find icon."));
             }
             _logger.LogInformation("Creating new objective.");
-            Objective objective = new Objective
+            Objective objective = new()
             {
                 Icon = icon,
+                Special = true,
                 ID = Guid.NewGuid(),
                 Subject = body.Subject,
                 Template = body.Template,
@@ -192,7 +193,7 @@ namespace TradeSaber.Controllers
                     }
                 }
             }
-            Objective.Result result = new Objective.Result
+            Objective.Result result = new()
             {
                 Modifier = modValue,
                 Objective = objective,

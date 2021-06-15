@@ -9,6 +9,7 @@ namespace TradeSaber.Models
     {
         public Guid ID { get; set; }
         public bool Active { get; set; }
+        public bool Special { get; set; }
 
         [JsonIgnore]
         public Media Icon { get; set; } = null!;
