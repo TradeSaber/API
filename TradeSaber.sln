@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30907.101
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31512.422
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeSaber", "TradeSaber\TradeSaber.csproj", "{05506B32-7A76-4BE7-8113-4D0ABF31D5D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TradeSaber", "TradeSaber\TradeSaber.csproj", "{4E01C953-1863-4D96-A37B-1065E8C3DA80}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,15 +11,15 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{05506B32-7A76-4BE7-8113-4D0ABF31D5D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{05506B32-7A76-4BE7-8113-4D0ABF31D5D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{05506B32-7A76-4BE7-8113-4D0ABF31D5D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{05506B32-7A76-4BE7-8113-4D0ABF31D5D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E01C953-1863-4D96-A37B-1065E8C3DA80}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E01C953-1863-4D96-A37B-1065E8C3DA80}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E01C953-1863-4D96-A37B-1065E8C3DA80}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E01C953-1863-4D96-A37B-1065E8C3DA80}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {422923D3-F453-4164-9C5C-EEF476DEF1F9}
+		SolutionGuid = {80FB955F-7A68-4879-9DB4-493B153A1387}
 	EndGlobalSection
 EndGlobal

@@ -1,3 +1,0 @@
-# API
- API for TradeSaber
- 
