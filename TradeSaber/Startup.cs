@@ -27,12 +27,17 @@ namespace TradeSaber
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JWTSettings>(Configuration.GetSection(nameof(JWTSettings)));
-            services.Configure<JWTSettings>(Configuration.GetSection(nameof(SoriginSettings)));
+            services.Configure<MainSettings>(Configuration.GetSection(nameof(MainSettings)));
+            services.Configure<SoriginSettings>(Configuration.GetSection(nameof(SoriginSettings)));
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<MainSettings>>().Value);
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<SoriginSettings>>().Value);
 
             services.AddHttpClient();
+            services.AddSingleton<SoriginAuthorizer>();
 
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IAuthService, TradeSaberAuthService>();
 
             services.AddDbContext<TradeContext>(options =>
@@ -68,7 +73,7 @@ namespace TradeSaber
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

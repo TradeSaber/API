@@ -6,6 +6,7 @@ namespace TradeSaber
     public class TradeContext : DbContext
     {
         public DbSet<User> Users => Set<User>();
+        public DbSet<Role> Roles => Set<Role>();
 
         public TradeContext(DbContextOptions<TradeContext> options) : base(options) { }
 

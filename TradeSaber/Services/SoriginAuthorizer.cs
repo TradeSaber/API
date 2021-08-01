@@ -29,10 +29,12 @@ namespace TradeSaber.Services
         /// <returns>If authorization was successful, the Sorigin user.</returns>
         public async Task<SoriginUser?> Authorize(string token)
         {
+            string url = $"{_soriginSettings.SoriginAPI}/api/auth/@me";
+            _logger.LogInformation(url);
             _logger.LogInformation("Fetching Sorigin user.");
             HttpRequestMessage message = new()
             {
-                RequestUri = new Uri($"{_soriginSettings.SoriginAPI}/api/auth/@me"),
+                RequestUri = new Uri(url),
                 Method = HttpMethod.Get    
             };
             message.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -43,7 +45,7 @@ namespace TradeSaber.Services
                 _logger.LogWarning("Could not get Sorigin user! {Code}.", response.StatusCode);
                 return null;
             }
-            SoriginUser? soriginUser = await JsonSerializer.DeserializeAsync<SoriginUser>(await response.Content.ReadAsStreamAsync());
+            SoriginUser? soriginUser = await JsonSerializer.DeserializeAsync<SoriginUser>(await response.Content.ReadAsStreamAsync(), new JsonSerializerOptions(JsonSerializerDefaults.Web));
             if (soriginUser is null)
             {
                 _logger.LogWarning("Could not serialize Sorigin user!");

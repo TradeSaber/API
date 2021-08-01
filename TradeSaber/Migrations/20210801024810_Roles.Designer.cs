@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using TradeSaber;
@@ -10,9 +11,10 @@ using TradeSaber;
 namespace TradeSaber.Migrations
 {
     [DbContext(typeof(TradeContext))]
-    partial class TradeContextModelSnapshot : ModelSnapshot
+    [Migration("20210801024810_Roles")]
+    partial class Roles
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,19 +34,15 @@ namespace TradeSaber.Migrations
                         .HasColumnType("text")
                         .HasColumnName("name");
 
-                    b.Property<bool>("Root")
-                        .HasColumnType("boolean")
-                        .HasColumnName("root");
-
                     b.Property<List<string>>("Scopes")
                         .IsRequired()
                         .HasColumnType("text[]")
                         .HasColumnName("scopes");
 
                     b.HasKey("ID")
-                        .HasName("pk_roles");
+                        .HasName("pk_role");
 
-                    b.ToTable("roles");
+                    b.ToTable("role");
                 });
 
             modelBuilder.Entity("TradeSaber.Models.User", b =>
@@ -72,7 +70,7 @@ namespace TradeSaber.Migrations
                     b.HasOne("TradeSaber.Models.Role", "Role")
                         .WithMany()
                         .HasForeignKey("RoleID")
-                        .HasConstraintName("fk_users_roles_role_id");
+                        .HasConstraintName("fk_users_role_role_id");
 
                     b.Navigation("Role");
                 });
