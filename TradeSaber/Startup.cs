@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using TradeSaber.Authorization;
@@ -33,6 +35,12 @@ namespace TradeSaber
 
             services.AddScoped<IAuthService, TradeSaberAuthService>();
 
+            services.AddDbContext<TradeContext>(options =>
+            {
+                options.UseNpgsql(Configuration.GetConnectionString("Default"));
+                options.UseSnakeCaseNamingConvention();
+            });
+
             services.AddControllers();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearerConfiguration(Configuration["JWTSettings:Issuer"], Configuration["JWTSettings:Audience"], Configuration["JWTSettings:Key"]);
@@ -40,8 +48,18 @@ namespace TradeSaber
             services.AddSingleton<IAuthorizationHandler, RequireScopeHandler>();
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, TradeContext tradeContext, ILogger<Startup> logger)
         {
+            logger.LogInformation("Ensuring that the database is created...");
+            try
+            {
+                tradeContext.Database.Migrate();
+            }
+            catch
+            {
+                logger.LogInformation("Migrations were not applied.");
+            }
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();

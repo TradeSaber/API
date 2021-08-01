@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
 using Serilog.Events;
@@ -15,6 +16,7 @@ namespace TradeSaber
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args).UseSerilog()
+                
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
@@ -23,7 +25,7 @@ namespace TradeSaber
         private static ILogger TradeSaberLogger()
         {
             var config = new LoggerConfiguration()
-                .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+                .ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build())
                 .Enrich.FromLogContext()
                 .WriteTo.Console();
             return config.CreateLogger();
