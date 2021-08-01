@@ -25,7 +25,11 @@ namespace TradeSaber
         public void ConfigureServices(IServiceCollection services)
         {
             services.Configure<JWTSettings>(Configuration.GetSection(nameof(JWTSettings)));
+            services.Configure<JWTSettings>(Configuration.GetSection(nameof(SoriginSettings)));
             services.AddSingleton(sp => sp.GetRequiredService<IOptions<JWTSettings>>().Value);
+            services.AddSingleton(sp => sp.GetRequiredService<IOptions<SoriginSettings>>().Value);
+
+            services.AddHttpClient();
 
             services.AddScoped<IAuthService, TradeSaberAuthService>();
 
