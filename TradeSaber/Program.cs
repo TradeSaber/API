@@ -22,7 +22,7 @@ namespace TradeSaber
                     webBuilder.UseStartup<Startup>();
                 });
 
-        private static ILogger TradeSaberLogger()
+        private static Serilog.ILogger TradeSaberLogger()
         {
             var config = new LoggerConfiguration()
                 .ReadFrom.Configuration(new ConfigurationBuilder().AddJsonFile("appsettings.json").Build())
